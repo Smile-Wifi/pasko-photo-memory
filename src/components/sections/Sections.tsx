@@ -9,6 +9,7 @@ import { siteDataQuery } from "@/lib/queries";
 import { useLang } from "@/lib/i18n";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import sampleArtwork from "@/assets/pasko-sample-transformations.jpg.asset.json";
+import howItWorksArtwork from "@/assets/pasko-how-it-works.jpg.asset.json";
 
 function useStyleImages() {
   const { data } = useQuery(siteDataQuery);
@@ -81,8 +82,16 @@ const STEPS = [
   { icon: Sparkles, title: "Generate 5 fotos", text: "After payment verification, we create five Christmas photos to download and share.", img: STYLES[3].image },
 ];
 
-export function HowItWorks() {
+export function HowItWorks({ artwork = false }: { artwork?: boolean }) {
   const { t } = useLang();
+  if (artwork) return (
+    <section aria-label="How it works" className="bg-background">
+      <div className="relative mx-auto max-w-3xl">
+        <h2 className="sr-only">How It Works — 4 Easy Steps</h2>
+        <img src={howItWorksArtwork.url} alt="How it works: 1. Upload your old photo — any clear photo of a face, old, faded or new. 2. Choose your template — pick your first Christmas look, all five styles are included. 3. Payment — choose ₱99 Basic or ₱149 with music, pay with GCash, Maya or bank transfer. 4. Generate 5 photos — after payment verification, we create five Christmas photos to download and share." width={960} height={1456} loading="lazy" className="block h-auto w-full" />
+      </div>
+    </section>
+  );
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 md:py-24">
       <SectionTitle eyebrow="4 easy steps" title={t("howTitle")} />

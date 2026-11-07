@@ -20,7 +20,7 @@ function Index() {
   return (
     <>
       <FestiveStudio />
-      <HowItWorks />
+      <HowItWorks artwork />
       <StyleGallery artwork />
       <Faq />
     </>
