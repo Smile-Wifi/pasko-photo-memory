@@ -38,6 +38,8 @@
   --color-pine-foreground: var(--pine-foreground);
   --color-snow: var(--snow);
   --color-success: var(--success);
+  --color-christmas: var(--christmas);
+  --color-ice: var(--ice);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -55,7 +57,7 @@
 
 :root {
   --radius: 1rem;
-  --background: oklch(0.975 0.012 85);
+  --background: oklch(0.985 0.006 240);
   --foreground: oklch(0.24 0.05 155);
   --card: oklch(0.995 0.005 85);
   --card-foreground: oklch(0.24 0.05 155);
@@ -80,6 +82,9 @@
   --pine-foreground: oklch(0.97 0.015 85);
   --snow: oklch(0.99 0.005 85);
   --success: oklch(0.55 0.14 150);
+  --christmas: oklch(0.44 0.17 145);
+  --ice: oklch(0.48 0.14 250);
+  --shadow-photo: 0 5px 14px color-mix(in oklab, var(--pine) 25%, transparent);
   --chart-1: oklch(0.55 0.21 27);
   --chart-2: oklch(0.45 0.12 155);
   --chart-3: oklch(0.8 0.14 82);
@@ -115,7 +120,7 @@
   }
   h1, h2, h3 {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
   }
 }
 
@@ -133,6 +138,37 @@
 }
 @utility shadow-card {
   box-shadow: var(--shadow-card);
+}
+@utility shadow-photo {
+  box-shadow: var(--shadow-photo);
+}
+
+.christmas-studio { background-color: var(--snow); }
+.studio-backdrop { object-position: center; }
+.studio-copy h1, .studio-copy h2, .studio-package h3 { font-family: var(--font-sans); }
+.studio-headline { font-size: 3.5rem; text-shadow: 2px 3px var(--snow); }
+.photo-collage { aspect-ratio: 1.35; }
+.studio-ribbon { transform: rotate(-3deg); box-shadow: var(--shadow-cta); }
+.package-price { font-size: 4rem; }
+@media (max-width: 767px) {
+  .studio-intro { gap: 0.5rem; }
+  .studio-headline { font-size: 1.875rem; margin-top: 0.5rem; }
+  .studio-copy h1 { font-size: 1.25rem; }
+  .studio-copy > p:first-child { font-size: 0.625rem; margin-top: 0; }
+  .christmas-studio > div { padding-top: 1rem; }
+  .studio-copy h2 br { display: none; }
+  .studio-copy h2 span { display: block; }
+  .studio-copy p { margin-top: 0.65rem; }
+  .studio-ribbon { display: none; }
+  .photo-collage { max-width: 300px; aspect-ratio: 1.6; }
+  .magic-seal { width: 3.75rem; height: 3.75rem; right: -0.5rem; }
+  .magic-seal > span:first-child { font-size: 1.25rem; line-height: 1.1; }
+  .magic-seal > span:last-child { font-size: 0.5rem; line-height: 1.1; }
+  .photo-collage > p { bottom: -0.5rem; font-size: 0.5rem; }
+  .package-price { font-size: 2.75rem; }
+  .studio-backdrop { object-fit: fill; height: 760px; }
+  .benefit-strip > div:nth-child(4) { grid-column: 1 / 2; margin-left: 50%; width: 100%; }
+  .benefit-strip > div:nth-child(5) { grid-column: 2 / 3; margin-left: 50%; width: 100%; }
 }
 @utility text-gold-gradient {
   background-image: var(--gradient-gold);

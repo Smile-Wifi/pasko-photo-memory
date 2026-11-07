@@ -18,6 +18,7 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
         festive:
           "bg-cta text-primary-foreground shadow-cta rounded-full font-bold tracking-wide hover:brightness-110 active:scale-[0.98] transition-all",
+        christmas: "bg-christmas text-pine-foreground rounded-full font-bold shadow-card hover:brightness-110 active:scale-[0.98] transition-all",
         gold: "bg-gold-gradient text-gold-foreground rounded-full font-bold shadow-card hover:brightness-105 active:scale-[0.98] transition-all",
         snow: "bg-snow/10 text-pine-foreground border border-snow/25 rounded-full backdrop-blur hover:bg-snow/20",
       },
