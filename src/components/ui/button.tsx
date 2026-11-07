@@ -16,8 +16,13 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        festive:
+          "bg-cta text-primary-foreground shadow-cta rounded-full font-bold tracking-wide hover:brightness-110 active:scale-[0.98] transition-all",
+        gold: "bg-gold-gradient text-gold-foreground rounded-full font-bold shadow-card hover:brightness-105 active:scale-[0.98] transition-all",
+        snow: "bg-snow/10 text-pine-foreground border border-snow/25 rounded-full backdrop-blur hover:bg-snow/20",
       },
       size: {
+        xl: "h-14 px-8 text-base",
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-md px-3 text-xs",
         lg: "h-10 rounded-md px-8",
