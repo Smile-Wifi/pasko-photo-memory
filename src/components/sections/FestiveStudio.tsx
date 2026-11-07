@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Camera, Check, Music, ShieldCheck, Smartphone, Sparkles, Zap } from "lucide-react";
 import backdrop from "@/assets/christmas-studio.jpg";
 import studioArtwork from "@/assets/pasko-christmas-studio.jpg.asset.json";
+import packageArtwork from "@/assets/pasko-package-choices.jpeg.asset.json";
 import { Button } from "@/components/ui/button";
 import { DEFAULT_PRICES, PACKAGES, peso, type PackageId } from "@/lib/catalog";
 import { siteDataQuery } from "@/lib/queries";
@@ -24,7 +25,12 @@ export function FestiveStudio() {
       <div className="mx-auto max-w-6xl px-4 pb-8 md:px-8">
         <h1 className="sr-only">Pasko Photo Magic – Balik Alaala sa Pasko</h1>
         <img src={studioArtwork.url} alt="Pasko Photo Magic. Balik Alaala sa Pasko. Old Foto, Magical Xmas! Turn your old photo into 5 amazing Christmas photos. Original portrait beside five illustrative Christmas transformations. Actual results may vary." width={816} height={768} fetchPriority="high" className="studio-artwork mx-auto block h-auto w-full object-contain" />
-        <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-3 md:mt-7 md:gap-6">
+        {prices.basic === 99 && prices.premium === 149 ? <div className="relative mx-auto mt-6 max-w-4xl overflow-hidden md:mt-7">
+          <h2 className="sr-only">Pasko Photo Magic packages</h2>
+          <img src={packageArtwork.url} alt="Basic Magic: ₱99, one uploaded photo becomes five Christmas photos, no background music. Magic with Music: ₱149, five Christmas photos with slideshow and music, recommended. Pay with GCash, Maya or bank transfer." width={1152} height={768} className="-mt-[15.625%] block h-auto w-full" loading="lazy" />
+          <Button asChild variant="ghost" className="absolute left-[2%] top-[1%] h-[83%] w-[47%] rounded-lg p-0 hover:bg-transparent focus-visible:ring-inset"><Link to="/create" search={{ pkg: "basic" }} aria-label="Get Started — Basic Magic, ₱99"><span className="sr-only">Get Started — Basic Magic, ₱99</span></Link></Button>
+          <Button asChild variant="ghost" className="absolute right-[2%] top-[1%] h-[83%] w-[47%] rounded-lg p-0 hover:bg-transparent focus-visible:ring-inset"><Link to="/create" search={{ pkg: "premium" }} aria-label="Get Started — Magic with Music, ₱149"><span className="sr-only">Get Started — Magic with Music, ₱149</span></Link></Button>
+        </div> : <><div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-3 md:mt-7 md:gap-6">
           {(["basic", "premium"] as PackageId[]).map(id => {
             const premium = id === "premium";
             return <div key={id} className={`studio-package relative flex flex-col items-center rounded-lg border-2 bg-snow/95 p-3 text-center shadow-card md:p-5 ${premium ? "border-christmas text-christmas" : "border-primary text-primary"}`}>
@@ -36,7 +42,7 @@ export function FestiveStudio() {
             </div>;
           })}
         </div>
-        <p className="mt-3 text-center text-xs font-medium text-pine">Pay with GCash · Maya · Bank transfer</p>
+        <p className="mt-3 text-center text-xs font-medium text-pine">Pay with GCash · Maya · Bank transfer</p></>}
         <div className="benefit-strip mt-6 grid grid-cols-3 gap-y-4 border-y border-snow/80 bg-snow/90 px-2 py-5 md:grid-cols-5">
           {benefits.map(b => <div key={b.title} className="flex flex-col items-center px-1 text-center"><b.icon className={`mb-2 size-7 md:size-9 ${b.tone}`} strokeWidth={2.3} /><p className="text-xs font-bold text-foreground md:text-sm">{b.title}</p><p className="mt-1 text-[10px] italic text-muted-foreground md:text-xs">{b.sub}</p></div>)}
         </div>
