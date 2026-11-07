@@ -19,6 +19,7 @@ import {
 } from "@/lib/api/admin.functions";
 import { PACKAGES, PAYMENT_METHODS, STATUS_LABEL, STYLES, peso, type OrderStatus } from "@/lib/catalog";
 import { canGenerate as paymentAllowsGeneration, generationOrder } from "@/lib/order-process";
+import { AdminPhotoTest } from "@/components/AdminPhotoTest";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -74,9 +75,9 @@ function AdminPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-3xl font-bold text-pine">Admin Dashboard</h1>
-        <Button variant="ghost" size="sm" onClick={signOut}><LogOut /> Sign out</Button>
+        <div className="flex items-center gap-2"><AdminPhotoTest /><Button variant="ghost" size="sm" onClick={signOut}><LogOut /> Sign out</Button></div>
       </div>
       <Tabs defaultValue="orders">
         <TabsList className="mb-6">

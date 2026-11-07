@@ -40,3 +40,4 @@ use the editor.
 - Checkout uses a gated photo/template/payment sequence; the stored template is generated first, followed by the remaining catalog styles, so every order still includes five photos.
 - Generation and retries require a stored admin payment-verification timestamp, not just a failed/processing status, to prevent unpaid generation.
 - Photo editing uses the official Replicate SDK through the connector gateway with the linked connection key; transport disables automatic replay and results remain private PNGs — honors the owner's provider choice without duplicating billed work.
+- Admin photo tests require server-verified admin access and return transient images without touching orders or payments — permits diagnostics without bypassing customer payment gates.
