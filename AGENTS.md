@@ -28,3 +28,11 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## XmasMagic PH architecture
+- Customers never sign in; orders are created and read only through server functions in `src/lib/api/orders.functions.ts` using a secret per-order access token — keeps photos private without customer accounts.
+- Server functions live in `src/lib/api/*.functions.ts`; server-only helpers live in `src/server/*.server.ts` and are imported dynamically inside handlers — the `src/server` folder is blocked from client bundles.
+- Storage buckets are private (`order-photos`, `site-media`); browsers only get short-lived signed URLs — workspace blocks public buckets.
+- Prices are always read from `app_settings` on the server when creating an order — never trust client prices.
+- Orders move to Payment Verified only by an admin; AI generation runs one style per server call from the admin dashboard — avoids worker timeouts.
+- The first account to sign up becomes admin (trigger `handle_first_admin`); roles live in `user_roles`.

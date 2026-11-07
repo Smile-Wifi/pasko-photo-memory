@@ -1,4 +1,5 @@
 import original from "@/assets/style-original.jpg";
+import santa from "@/assets/style-santa.jpg";
 import family from "@/assets/style-family.jpg";
 import winter from "@/assets/style-winter.jpg";
 import lights from "@/assets/style-lights.jpg";
@@ -15,7 +16,7 @@ export const STYLES = [
   {
     key: "santa",
     name: "Santa Claus Christmas",
-    image: null as string | null,
+    image: santa as string | null,
     prompt:
       "Transform this photo into a festive Santa Claus Christmas portrait: the person wears a classic red Santa hat and cozy red-and-white Christmas outfit, warm living room with fireplace and stockings, soft warm lighting.",
   },
