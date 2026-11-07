@@ -15,5 +15,10 @@
 # Google Gemini integration
 - [x] Connect verified photo generation to the saved Gemini key without exposing credentials.
 - [x] Attempt a real sample photo edit: Google returns 429 with a zero free-tier image quota; do not retry or change providers.
-- [ ] Complete live generation after the owner enables Google image-generation billing/quota; authenticated order verification also needs the owner to sign in.
+- [x] Gemini billing blocker superseded by the owner's request to switch to Replicate.
 - [x] Verify the homepage and admin sign-in gate, pass 12 automated checks including payment protection, and save the changes.
+
+# Replicate switch
+- [x] Link Replicate and switch reference-photo editing to FLUX Kontext Pro, preserving the paid-order gate and private PNG storage.
+- [x] Pass 17 automated checks and generate a real Christmas sample PNG using the linked account.
+- [ ] Verify a paid order generates and reads back in the admin/customer screens; blocked because no admin account has been created yet.

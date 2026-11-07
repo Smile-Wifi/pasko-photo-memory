@@ -39,4 +39,4 @@ use the editor.
 - The homepage Christmas studio presentation lives in a dedicated section and reads the shared catalog and site settings, so visual redesigns do not change checkout rules.
 - Checkout uses a gated photo/template/payment sequence; the stored template is generated first, followed by the remaining catalog styles, so every order still includes five photos.
 - Generation and retries require a stored admin payment-verification timestamp, not just a failed/processing status, to prevent unpaid generation.
-- Photo editing uses the saved Gemini key (Google key only when Gemini is unset), with no automatic provider fallback or replay — honors the owner's provider choice without duplicating billed work.
+- Photo editing uses the official Replicate SDK through the connector gateway with the linked connection key; transport disables automatic replay and results remain private PNGs — honors the owner's provider choice without duplicating billed work.

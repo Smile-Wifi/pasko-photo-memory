@@ -2,55 +2,65 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { editPhoto, IMAGE_MODEL } from "@/server/ai.server";
 
+const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+const output = "https://replicate.delivery/test/result.png";
+const photo = () => new Blob([new Uint8Array([4, 5])], { type: "image/webp" });
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
-
 function setup() {
-  vi.stubEnv("GEMINI_API_KEY", "test-gemini-key");
-  vi.stubEnv("GOOGLE_API_KEY", "test-google-key");
-  const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-    candidates: [{ content: { parts: [{ inlineData: { mimeType: "image/png", data: "AQID" } }] } }],
-  }), { status: 200 }));
+  vi.stubEnv("LOVABLE_API_KEY", "test-lovable-key");
+  vi.stubEnv("REPLICATE_API_KEY", "test-connection-key");
+  const fetcher = vi.fn()
+    .mockResolvedValueOnce(Response.json({ id: "test", status: "succeeded", output }))
+    .mockResolvedValueOnce(new Response(png, { headers: { "Content-Type": "image/png" } }));
   vi.stubGlobal("fetch", fetcher);
   return fetcher;
 }
-
-describe("Gemini reference-photo editing", () => {
-  it("sends the original photo and template to Gemini using the saved Gemini key", async () => {
+describe("Replicate reference-photo editing", () => {
+  it("uses FLUX Kontext Pro with the original, prompt, portrait ratio and PNG output", async () => {
     const fetcher = setup();
-    expect(await editPhoto(new Blob([new Uint8Array([4, 5])], { type: "image/webp" }), "Santa portrait")).toEqual(new Uint8Array([1, 2, 3]));
-    const call = fetcher.mock.calls[0];
-    if (!call) throw new Error("Expected a Gemini request");
-    const [url, init] = call;
-    expect(url).toBe(`https://generativelanguage.googleapis.com/v1beta/models/${IMAGE_MODEL}:generateContent`);
-    expect(init.headers["x-goog-api-key"]).toBe("test-gemini-key");
-    expect(JSON.parse(init.body)).toEqual({
-      contents: [{ role: "user", parts: [{ text: "Santa portrait" }, { inlineData: { mimeType: "image/webp", data: "BAU=" } }] }],
-      generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: "2:3" } },
-    });
+    expect(await editPhoto(photo(), "Santa portrait")).toEqual(png);
+    expect(fetcher.mock.calls[0]?.[0]).toBe(`https://connector-gateway.lovable.dev/replicate/v1/models/${IMAGE_MODEL}/predictions`);
+    const init = fetcher.mock.calls[0]?.[1];
+    expect(init.headers.get("Authorization")).toBe("Bearer test-lovable-key");
+    expect(init.headers.get("X-Connection-Api-Key")).toBe("test-connection-key");
+    expect(JSON.parse(init.body).input).toEqual({ prompt: "Santa portrait", input_image: "data:image/webp;base64,BAU=", aspect_ratio: "2:3", output_format: "png" });
+    expect(fetcher.mock.calls[1]).toEqual([output]);
   });
-  it("uses the saved Google key only when Gemini is not configured", async () => {
-    const fetcher = setup(); vi.stubEnv("GEMINI_API_KEY", "");
-    await editPhoto(new Blob(["photo"], { type: "image/jpeg" }), "Santa");
-    expect(fetcher.mock.calls[0]?.[1].headers["x-goog-api-key"]).toBe("test-google-key");
-  });
-  it("blocks calls when neither saved key exists", async () => {
-    const fetcher = setup(); vi.stubEnv("GEMINI_API_KEY", ""); vi.stubEnv("GOOGLE_API_KEY", "");
-    await expect(editPhoto(new Blob(["photo"], { type: "image/jpeg" }), "Santa")).rejects.toMatchObject({ status: 401 });
+  it("blocks missing connection credentials without using saved Google credentials", async () => {
+    const fetcher = setup(); vi.stubEnv("REPLICATE_API_KEY", ""); vi.stubEnv("GEMINI_API_KEY", "unused-key");
+    await expect(editPhoto(photo(), "Santa")).rejects.toMatchObject({ status: 401 });
     expect(fetcher).not.toHaveBeenCalled();
   });
-  it("preserves provider failures, hides credentials and does not retry or switch keys", async () => {
+  it.each([402, 403, 429, 500])("preserves HTTP %s, redacts credentials and never replays creation", async status => {
     const fetcher = setup();
-    fetcher.mockResolvedValue(new Response(JSON.stringify({ error: { message: "Denied test-gemini-key test-google-key" } }), { status: 403 }));
-    await expect(editPhoto(new Blob(["photo"], { type: "image/jpeg" }), "Santa")).rejects.toMatchObject({ status: 403, message: "Denied [redacted] [redacted]" });
+    fetcher.mockReset().mockResolvedValue(new Response("test-lovable-key test-connection-key", { status }));
+    await expect(editPhoto(photo(), "Santa")).rejects.toMatchObject({ status, message: expect.stringContaining("[redacted] [redacted]") });
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
-  it("does not claim success when Gemini refuses a request", async () => {
-    const fetcher = setup(); fetcher.mockResolvedValue(new Response(JSON.stringify({ promptFeedback: { blockReason: "SAFETY" } })));
-    await expect(editPhoto(new Blob(["photo"], { type: "image/jpeg" }), "Santa")).rejects.toMatchObject({ status: 422 });
+  it("explains the account credit blocker", async () => {
+    const fetcher = setup(); fetcher.mockReset().mockResolvedValue(new Response("Insufficient credit", { status: 402 }));
+    await expect(editPhoto(photo(), "Santa")).rejects.toThrow("https://replicate.com/account/billing");
+  });
+  it("rejects a refused prediction without downloading an image", async () => {
+    const fetcher = setup(); fetcher.mockReset().mockResolvedValue(Response.json({ status: "failed", error: "Safety refusal" }));
+    await expect(editPhoto(photo(), "Santa")).rejects.toMatchObject({ status: 422 });
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
-  it("does not claim success for text-only output", async () => {
-    const fetcher = setup(); fetcher.mockResolvedValue(new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "No image" }] } }] })));
-    await expect(editPhoto(new Blob(["photo"], { type: "image/jpeg" }), "Santa")).rejects.toMatchObject({ status: 502 });
+  it("rejects empty results rather than claiming completion", async () => {
+    const fetcher = setup(); fetcher.mockReset().mockResolvedValue(Response.json({ status: "succeeded", output: null }));
+    await expect(editPhoto(photo(), "Santa")).rejects.toMatchObject({ status: 502 });
+  });
+  it("rejects corrupt downloads instead of saving fake PNGs", async () => {
+    const fetcher = setup(); fetcher.mockReset().mockResolvedValueOnce(Response.json({ status: "succeeded", output })).mockResolvedValueOnce(new Response("not an image"));
+    await expect(editPhoto(photo(), "Santa")).rejects.toMatchObject({ status: 502 });
+  });
+  it("polls the same prediction through the gateway without starting another", async () => {
+    const fetcher = setup(); fetcher.mockReset()
+      .mockResolvedValueOnce(Response.json({ id: "existing", status: "processing" }))
+      .mockResolvedValueOnce(Response.json({ id: "existing", status: "succeeded", output }))
+      .mockResolvedValueOnce(new Response(png));
+    await editPhoto(photo(), "Santa");
+    expect(fetcher.mock.calls[1]?.[0]).toBe("https://connector-gateway.lovable.dev/replicate/v1/predictions/existing");
+    expect(fetcher.mock.calls.filter(call => call[1]?.method === "POST")).toHaveLength(1);
   });
 });
