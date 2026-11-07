@@ -1,9 +1,9 @@
 import original from "@/assets/style-original.jpg";
-import santa from "@/assets/template-santa-v3.jpg.asset.json";
-import family from "@/assets/template-family-v3.jpg.asset.json";
-import winter from "@/assets/template-winter-v3.jpg.asset.json";
-import lights from "@/assets/template-lights-v3.jpg.asset.json";
-import fashion from "@/assets/template-fashion-v3.jpg.asset.json";
+import santa from "@/assets/template-simbang.jpg.asset.json";
+import family from "@/assets/template-pajama.jpg.asset.json";
+import winter from "@/assets/template-snow.jpg.asset.json";
+import lights from "@/assets/template-street.jpg.asset.json";
+import fashion from "@/assets/template-traditional.jpg.asset.json";
 
 export type PackageId = "basic" | "premium";
 export type PaymentMethod = "gcash" | "maya" | "bank";
@@ -15,43 +15,43 @@ export const ORIGINAL_SAMPLE = original;
 export const STYLES = [
   {
     key: "santa",
-    name: "Santa Claus Christmas",
+     name: "Simbang Gabi",
     image: santa.url as string | null,
     prompt:
-      "Transform this photo into a warm Filipino Santa Claus Christmas portrait: everyone wears red Santa hats, women and girls in red Filipiniana dresses with gold embroidery, men in cream barong, cozy living room with a decorated Christmas tree, fireplace and stockings, warm golden lighting.",
+      "Transform the uploaded subjects into a photorealistic Simbang Gabi Christmas portrait outside a historic Filipino stone church at dusk. Show a cobblestone path, glowing parol star lanterns overhead, warm handheld lanterns, and soft golden church lights. Dress men and boys in cream embroidered barong and dark trousers, and women and girls in elegant cream and champagne Filipiniana dresses. Keep the uploaded subjects together as the main focus, with a softly out-of-focus festive church courtyard behind them. No Santa hats, snow, captions, or watermarks.",
   },
   {
     key: "family",
-    name: "Christmas Family Portrait",
+    name: "Pajama",
     image: family.url,
     prompt:
-      "Transform this photo into an elegant Filipino Christmas family portrait: seated together on a sofa in a capiz-window Filipino home with a glowing parol star, Christmas tree and fairy lights, red Filipiniana dresses and cream barong, warm professional studio quality.",
+      "Transform the uploaded subjects into a photorealistic cozy Christmas Pajama portrait. Dress everyone in matching red-and-green tartan pajamas, seated comfortably together on a sofa in a warm living room. Include a decorated Christmas tree, wrapped gifts, stockings, soft golden fairy lights, mugs of hot chocolate and a bowl of popcorn. Create a relaxed, joyful holiday moment with natural expressions and warm indoor lighting. No formal barong, outdoor snow, captions, or watermarks.",
   },
   {
     key: "winter",
-    name: "Winter Wonderland",
+    name: "Snow",
     image: winter.url,
     prompt:
-      "Transform this photo into a winter wonderland portrait: cozy white winter coats with fur trim over festive red outfits, holding warm mugs, in a snowy pine forest with gently falling snow, soft natural light.",
+      "Transform the uploaded subjects into a photorealistic Snow winter portrait in a snow-covered pine forest with gently falling snow and soft natural daylight. Dress everyone in cozy ivory padded winter coats, cream knitted scarves and winter hats, with a soft blush scarf where appropriate. Show them close together, holding mugs of hot chocolate, with clear visible faces and natural happy expressions. Keep the scene bright and realistic, with detailed snowy trees behind them. No Santa costumes, captions, or watermarks.",
   },
   {
     key: "lights",
-    name: "Cozy Golden Christmas",
+    name: "Street Celebration",
     image: lights.url,
     prompt:
-      "Transform this photo into a cozy golden Christmas portrait: wearing Santa hats, cream barong and red Filipiniana, holding warm mugs beside glowing candles, under a garland of golden fairy lights, pine cones and dried oranges, warm candlelit glow.",
+      "Transform the uploaded subjects into a photorealistic Filipino Christmas Street Celebration portrait at night. Show a lively festive street beneath many colorful glowing parol star lanterns and strings of Christmas lights, with small food stalls and softly blurred celebration crowds behind the subjects. Dress men and boys in black shirts with festive red floral patterns and women and girls in coordinated red holiday outfits. Frame the uploaded subjects close together facing the camera, with bright natural faces and joyful expressions. No snow, Santa hats, added foreground people, captions, or watermarks.",
   },
   {
     key: "fashion",
-    name: "A Magical Filipino Christmas",
+    name: "Traditional / Spanish / Barong",
     image: fashion.url,
     prompt:
-      "Transform this photo into a magical Filipino Christmas portrait: standing in front of a tall golden Christmas tree in a traditional Filipino home with capiz windows, glowing parol star lanterns and poinsettias, red Filipiniana dresses and cream barong, warm festive lighting.",
+      "Transform the uploaded subjects into a photorealistic Traditional / Spanish / Barong Christmas portrait in an elegant Spanish-colonial Filipino home. Include dark carved wooden interiors, capiz windows, a chandelier, glowing parol star lanterns and a decorated Christmas tree. Dress men and boys in cream barong Tagalog with detailed gold embroidery and dark trousers; dress women and girls in deep burgundy Filipiniana gowns with gold embroidery and butterfly sleeves. Pose the uploaded subjects together in a formal, warm family portrait with realistic festive indoor lighting. No Santa hats, pajamas, snow, captions, or watermarks.",
   },
 ] as const;
 
 export const IDENTITY_RULE =
-  "Keep the person's face, facial features, skin tone, age, and natural appearance exactly the same as the original photo — the same recognizable person. If the original is old, faded or scratched, restore it to a clean, sharp, natural-looking modern photo. Photorealistic, high quality.";
+  "Use only the people in the uploaded photo as the portrait subjects. Preserve the exact number of subjects, their recognizable faces, facial features, skin tones, ages, body proportions, and natural appearance. Never add, remove, duplicate, replace, or merge a subject, and never copy the illustrative sample family. Adapt clothing and pose to the uploaded subjects, whether one person or a group; keep every face clearly visible. If the original is old, faded or scratched, restore it to a clean, sharp, natural-looking modern photo. Photorealistic, high quality, natural anatomy, no text or watermarks.";
 
 export const DEFAULT_PRICES: Record<PackageId, number> = { basic: 99, premium: 149 };
 

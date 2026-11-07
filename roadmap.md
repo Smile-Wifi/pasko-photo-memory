@@ -26,3 +26,8 @@
 # Tester access
 - [x] Add a no-code Test Photo button beside payment methods, using the uploaded photo and selected template without changing orders or payments.
 - [x] Verify a real signed-out test generates and displays a downloadable photo; mobile has no overflow and 20 automated checks retain paid-order protections.
+
+# Latest five-template artwork
+- [x] Replace the five template pictures and sample gallery with the owner's latest artwork.
+- [x] Match generation instructions and prompt.md to the five new scenes, retaining stored template keys and payment rules.
+- [x] Verify all five template selections, gallery navigation, mobile/desktop layout, and prompt coverage; 28 automated checks pass. No new billed photo generation performed.

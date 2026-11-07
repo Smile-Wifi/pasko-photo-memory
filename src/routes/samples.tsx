@@ -5,9 +5,9 @@ export const Route = createFileRoute("/samples")({
   head: () => ({
     meta: [
       { title: "Sample Christmas Photos – Pasko Photo Magic" },
-      { name: "description", content: "See the five magical Christmas styles: Santa, family portrait, winter wonderland, lights and Christmas fashion." },
+      { name: "description", content: "Explore Simbang Gabi, Snow, Pajama, Street Celebration, and Traditional / Spanish / Barong Christmas portraits." },
       { property: "og:title", content: "Sample Christmas Photos – Pasko Photo Magic" },
-      { property: "og:description", content: "See the five magical Christmas styles: Santa, family portrait, winter wonderland, lights and Christmas fashion." },
+      { property: "og:description", content: "Explore Simbang Gabi, Snow, Pajama, Street Celebration, and Traditional / Spanish / Barong Christmas portraits." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

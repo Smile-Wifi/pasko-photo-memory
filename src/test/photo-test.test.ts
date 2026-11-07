@@ -23,12 +23,12 @@ const checkoutHandler = testCheckoutPhoto as unknown as (input: { data: { photo:
 describe("checkout tester access", () => {
   it("generates all five styles, selected template first, one call each", async () => {
     edit.mockClear();
-    const order = [2, 0, 1, 3, 4]; // winter selected first, then the rest
+    const order = [2, 0, 1, 3, 4]; // Snow selected first, then the rest
     for (const index of order) await checkoutHandler({ data: { photo: "data:image/jpeg;base64,AQID", index } });
     expect(edit).toHaveBeenCalledTimes(5);
-    expect(edit.mock.calls[0]?.[1]).toContain("winter");
-    expect(edit.mock.calls[1]?.[1]).toContain("Santa");
-    expect(edit.mock.calls[4]?.[1]).toContain("magical Filipino");
+    expect(edit.mock.calls[0]?.[1]).toContain("Snow winter portrait");
+    expect(edit.mock.calls[1]?.[1]).toContain("Simbang Gabi");
+    expect(edit.mock.calls[4]?.[1]).toContain("Traditional / Spanish / Barong");
   });
   it("generates one test photo without a login, code, order or payment", async () => {
     edit.mockClear();

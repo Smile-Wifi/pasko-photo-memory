@@ -8,7 +8,7 @@ import { ORIGINAL_SAMPLE, PACKAGES, STYLES, DEFAULT_PRICES, peso, type PackageId
 import { siteDataQuery } from "@/lib/queries";
 import { useLang } from "@/lib/i18n";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import sampleArtwork from "@/assets/pasko-sample-transformations-v3.jpg.asset.json";
+import sampleArtwork from "@/assets/pasko-five-scenes.webp.asset.json";
 import howItWorksArtwork from "@/assets/pasko-how-it-works.jpg.asset.json";
 
 function useStyleImages() {
@@ -128,7 +128,7 @@ export function StyleGallery({ artwork = false }: { artwork?: boolean }) {
     <section aria-label="Sample Christmas transformations" className="bg-background">
       <div className="relative mx-auto max-w-3xl">
         <h2 className="sr-only">5 Magical Christmas Styles</h2>
-        <img src={sampleArtwork.url} alt="Pasko Photo Magic sample transformations. Every order includes all five styles. Original photo, Santa Claus Christmas, Christmas Family Portrait, Cozy Golden Christmas and Winter Wonderland. Illustrative examples." width={935} height={1600} loading="lazy" className="block h-auto w-full" />
+         <img src={sampleArtwork.url} alt="Pasko Photo Magic sample transformations: Simbang Gabi, Snow, Pajama, Street Celebration, and Traditional / Spanish / Barong. Every order includes all five styles. Illustrative examples, not customer results." width={1122} height={1920} loading="lazy" className="block h-auto w-full" />
         <Button asChild variant="ghost" className="absolute bottom-[2.5%] left-[12%] h-[7.5%] w-[76%] rounded-full p-0 hover:bg-transparent focus-visible:ring-4 focus-visible:ring-primary">
           <Link to="/create" aria-label="Create my Xmas photos"><span className="sr-only">Create my Xmas photos</span></Link>
         </Button>

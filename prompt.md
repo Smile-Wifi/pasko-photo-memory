@@ -30,13 +30,15 @@ Customers do not need to sign in. Keep order access private through a secret per
 
 ## Five Christmas styles
 
-1. Santa Claus Christmas
-2. Christmas Family Portrait
-3. Winter Wonderland
-4. Christmas Lights & Bokeh
-5. Red & Green Christmas Fashion
+1. **Simbang Gabi:** Outside a historic Filipino stone church at dusk, with a cobblestone path, glowing parol stars and handheld lanterns. Cream embroidered barong and champagne Filipiniana dresses; warm church lighting.
+2. **Snow:** Snow-covered pine forest, gently falling snow, ivory winter coats, knitted scarves and hats, mugs of hot chocolate, and soft daylight.
+3. **Pajama:** Matching red-and-green tartan pajamas on a cozy sofa, Christmas tree, gifts, stockings, hot chocolate, popcorn, and warm fairy lights.
+4. **Street Celebration:** A lively Filipino Christmas street at night beneath colorful parol lanterns, food stalls and softly blurred crowds. Black shirts with red floral patterns and coordinated red holiday outfits.
+5. **Traditional / Spanish / Barong:** A Spanish-colonial Filipino home with carved wood, capiz windows, chandelier, parol lanterns and Christmas tree. Cream embroidered barong and deep burgundy Filipiniana gowns with gold embroidery.
 
-Aim to preserve the subjects' recognizable faces, skin tones, ages, and natural appearance. Restore faded or scratched originals naturally and produce photorealistic Christmas portraits. Do not promise perfect identity preservation or present illustrative samples as actual customer results.
+Use the individual pictures from the owner's latest five-scene artwork as template previews. Match each scene in generation instructions. Preserve the existing stored template keys so older orders remain compatible.
+
+Aim to preserve the uploaded subjects' recognizable faces, skin tones, ages, body proportions, natural appearance, and exact number of people. Never add, remove, duplicate, merge, or replace subjects; never copy the illustrative sample family. Adapt each scene to a single person or group with every face clearly visible. Restore faded or scratched originals naturally and produce photorealistic Christmas portraits without captions or watermarks. Do not promise perfect identity preservation or present illustrative samples as actual customer results.
 
 ## Real AI photo generation
 
