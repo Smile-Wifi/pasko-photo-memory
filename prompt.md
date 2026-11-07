@@ -52,7 +52,7 @@ Aim to preserve the subjects' recognizable faces, skin tones, ages, and natural 
 
 - Place **Test Photo** beside the payment options, after a photo and template have been selected.
 - Testers must not need to sign in or enter an access code.
-- Use the uploaded photo and selected template to generate **one real test image**, show it, and offer a download.
+- Use the uploaded photo to generate **all five real test images** — the selected template first, then the remaining styles — one style per server call. Show each result and offer a download.
 - Show a loading state, prevent duplicate clicks during generation, and display failures clearly.
 - Test generation must not create or modify orders, verify payments, or bypass the paid five-photo generation gate.
 - Retain the separate admin-only photo-test control with server-verified admin access.
@@ -92,7 +92,7 @@ The owner requested Christmas music including the chorus of **Christmas in Our H
 
 - Test photo upload → template selection → payment → Pending Payment order creation, including persistence of the chosen template.
 - Verify unpaid orders cannot generate photos, including failed-order retry paths.
-- Verify the public Test Photo flow works without login or codes, produces a real downloadable image, and leaves orders and payments untouched.
+- Verify the public Test Photo flow works without login or codes, produces five real downloadable images (selected template first), and leaves orders and payments untouched.
 - Verify admin-only tests reject non-admin callers before any AI work.
 - Test provider errors, invalid images, duplicate-request prevention, and preservation of private credentials.
 - Check desktop and mobile artwork, navigation, dialogs, and downloads.

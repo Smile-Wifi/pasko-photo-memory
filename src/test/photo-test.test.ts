@@ -21,6 +21,15 @@ describe("admin photo tests", () => {
 
 const checkoutHandler = testCheckoutPhoto as unknown as (input: { data: { photo: string; index: number } }) => Promise<{ image: string }>;
 describe("checkout tester access", () => {
+  it("generates all five styles, selected template first, one call each", async () => {
+    edit.mockClear();
+    const order = [2, 0, 1, 3, 4]; // winter selected first, then the rest
+    for (const index of order) await checkoutHandler({ data: { photo: "data:image/jpeg;base64,AQID", index } });
+    expect(edit).toHaveBeenCalledTimes(5);
+    expect(edit.mock.calls[0]?.[1]).toContain("winter");
+    expect(edit.mock.calls[1]?.[1]).toContain("Santa");
+    expect(edit.mock.calls[4]?.[1]).toContain("fashion");
+  });
   it("generates one test photo without a login, code, order or payment", async () => {
     edit.mockClear();
     expect(await checkoutHandler({ data: { photo: "data:image/jpeg;base64,AQID", index: 2 } })).toEqual({ image: "data:image/png;base64,AQID" });

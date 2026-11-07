@@ -7,35 +7,73 @@ import { testCheckoutPhoto } from "@/lib/api/photo-test.functions";
 import { STYLES } from "@/lib/catalog";
 import type { TemplateId } from "@/lib/order-process";
 
+type Slot = { image: string; error: string; busy: boolean };
+
+const emptySlots = (): Slot[] => STYLES.map(() => ({ image: "", error: "", busy: false }));
+
 export function CheckoutPhotoTest({ photo, template }: { photo: string; template: TemplateId }) {
   const run = useServerFn(testCheckoutPhoto);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [image, setImage] = useState("");
-  const [error, setError] = useState("");
-  const index = STYLES.findIndex(style => style.key === template);
+  const [slots, setSlots] = useState<Slot[]>(emptySlots);
+  const first = STYLES.findIndex(style => style.key === template);
+  // Selected template first, then the remaining styles — same order as paid orders.
+  const order = [first < 0 ? 0 : first, ...STYLES.map((_, i) => i).filter(i => i !== (first < 0 ? 0 : first))];
+
   async function generate() {
-    if (busy || index < 0) return;
-    setBusy(true); setImage(""); setError("");
-    try {
-      const result = await run({ data: { photo, index } });
-      setImage(result.image);
-    } catch (e) { setError(e instanceof Error ? e.message : "Photo test failed. Please try again."); }
-    finally { setBusy(false); }
+    if (busy) return;
+    setBusy(true);
+    setSlots(emptySlots());
+    for (const index of order) {
+      setSlots(prev => prev.map((slot, i) => (i === index ? { ...slot, busy: true } : slot)));
+      try {
+        const result = await run({ data: { photo, index } });
+        setSlots(prev => prev.map((slot, i) => (i === index ? { image: result.image, error: "", busy: false } : slot)));
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Photo test failed. Please try again.";
+        setSlots(prev => prev.map((slot, i) => (i === index ? { image: "", error: message, busy: false } : slot)));
+      }
+    }
+    setBusy(false);
   }
+
+  const done = slots.some(slot => slot.image || slot.error);
+
   return <>
-    <Button type="button" variant="outline" className="mt-4" onClick={() => { setOpen(true); setImage(""); setError(""); }}><FlaskConical />Test Photo</Button>
+    <Button type="button" variant="outline" className="mt-4" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical />Test Photo</Button>
     <Dialog open={open} onOpenChange={value => { if (!busy) setOpen(value); }}>
       <DialogContent className="max-h-[90svh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Test Christmas Photo</DialogTitle>
-          <DialogDescription>One test uses Replicate credit. No payment or customer order is created.</DialogDescription>
+          <DialogTitle>Test Christmas Photos</DialogTitle>
+          <DialogDescription>Generates all 5 styles, one at a time. Each test uses Replicate credit. No payment or customer order is created.</DialogDescription>
         </DialogHeader>
-        <p className="font-semibold text-pine">{STYLES[index]?.name}</p>
-        <img src={image || photo} alt={image ? "Generated Christmas test photo" : "Your uploaded photo"} className="mx-auto max-h-80 w-full object-contain" />
-        {error && <p role="alert" className="break-words text-sm text-destructive">{error}</p>}
-        <Button type="button" variant="festive" disabled={busy} onClick={generate}>{busy ? <LoaderCircle className="animate-spin" /> : <FlaskConical />}{busy ? "Generating…" : image ? "Test again" : "Generate Test Photo"}</Button>
-        {image && <Button asChild variant="outline"><a href={image} download="pasko-test-photo.png"><Download />Download photo</a></Button>}
+        {!done && <img src={photo} alt="Your uploaded photo" className="mx-auto max-h-60 w-full object-contain" />}
+        <div className="grid grid-cols-2 gap-3">
+          {STYLES.map((style, index) => {
+            const slot = slots[index] ?? { image: "", error: "", busy: false };
+            return (
+              <div key={style.key} className="space-y-1">
+                <p className="text-xs font-semibold text-pine">{style.name}{index === first ? " (selected)" : ""}</p>
+                {slot.image ? (
+                  <img src={slot.image} alt={`${style.name} test photo`} className="w-full rounded-xl object-contain" />
+                ) : (
+                  <div className="flex h-32 items-center justify-center rounded-xl bg-snow/60 text-xs text-pine/70">
+                    {slot.busy ? <LoaderCircle className="animate-spin" /> : slot.error ? <span role="alert" className="break-words p-2 text-destructive">{slot.error}</span> : "Waiting…"}
+                  </div>
+                )}
+                {slot.image && (
+                  <Button asChild variant="outline" size="sm" className="w-full">
+                    <a href={slot.image} download={`pasko-test-${style.key}.png`}><Download />Download</a>
+                  </Button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        <Button type="button" variant="festive" disabled={busy} onClick={generate}>
+          {busy ? <LoaderCircle className="animate-spin" /> : <FlaskConical />}
+          {busy ? "Generating…" : done ? "Test again" : "Generate 5 Test Photos"}
+        </Button>
       </DialogContent>
     </Dialog>
   </>;
