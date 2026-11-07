@@ -41,7 +41,7 @@ export function AdminPhotoTest() {
         <div className="space-y-4">
           <div><Label htmlFor="test-photo">Photo</Label><Input id="test-photo" type="file" accept="image/jpeg,image/png,image/webp" disabled={busy} onChange={e => { setFile(e.target.files?.[0] ?? null); setImage(""); setError(""); }} /></div>
           <div><Label>Template</Label><Select value={index} onValueChange={setIndex} disabled={busy}><SelectTrigger aria-label="Test template"><SelectValue /></SelectTrigger><SelectContent>{STYLES.map((style, i) => <SelectItem key={style.key} value={String(i)}>{style.name}</SelectItem>)}</SelectContent></Select></div>
-          <p className="text-sm text-muted-foreground">One photo test uses your Replicate balance. No customer order or payment is changed.</p>
+          <p className="text-sm text-muted-foreground">One photo test uses the app's built-in AI. No customer order or payment is changed.</p>
           <Button disabled={!file || busy} onClick={generate} variant="festive">{busy ? <LoaderCircle className="animate-spin" /> : <FlaskConical />}{busy ? "Generating…" : "Generate Test Photo"}</Button>
           {error && <p role="alert" className="break-words text-sm text-destructive">{error}</p>}
           {image && <div className="space-y-3"><img src={image} alt="Generated Christmas test photo" className="mx-auto max-h-96 w-full object-contain" /><Button asChild variant="outline"><a href={image} download="pasko-test-photo.png">Download photo</a></Button></div>}

@@ -45,7 +45,7 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
       <DialogContent className="max-h-[90svh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Test Christmas Photos</DialogTitle>
-          <DialogDescription>Generates all 5 styles, one at a time. Each test uses Replicate credit. No payment or customer order is created.</DialogDescription>
+          <DialogDescription>Generates all 5 styles, one at a time, using the app's built-in AI. No payment or customer order is created.</DialogDescription>
         </DialogHeader>
         {!done && <img src={photo} alt="Your uploaded photo" className="mx-auto max-h-60 w-full object-contain" />}
         <div className="grid grid-cols-2 gap-3">
