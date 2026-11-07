@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { PhotoUploader, type PreparedPhoto } from "@/components/upload/PhotoUploader";
+import { CheckoutPhotoTest } from "@/components/CheckoutPhotoTest";
 import { DEFAULT_PRICES, PACKAGES, PAYMENT_METHODS, STYLES, normalizePhMobile, peso, type PackageId, type PaymentMethod } from "@/lib/catalog";
 import { canAdvance, type TemplateId } from "@/lib/order-process";
 import { siteDataQuery } from "@/lib/queries";
@@ -184,6 +185,7 @@ function CreatePage() {
               ))}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">You'll see the account details on the next page. We verify your payment before processing.</p>
+            {photo && template && <CheckoutPhotoTest photo={photo.dataUrl} template={template} />}
           </section>}
 
           {step > 1 && <Button type="button" variant="ghost" onClick={() => setStep(step - 1)} disabled={submitting}><ArrowLeft />Back</Button>}

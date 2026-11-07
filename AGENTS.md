@@ -41,3 +41,4 @@ use the editor.
 - Generation and retries require a stored admin payment-verification timestamp, not just a failed/processing status, to prevent unpaid generation.
 - Photo editing uses the official Replicate SDK through the connector gateway with the linked connection key; transport disables automatic replay and results remain private PNGs — honors the owner's provider choice without duplicating billed work.
 - Admin photo tests require server-verified admin access and return transient images without touching orders or payments — permits diagnostics without bypassing customer payment gates.
+- Checkout photo tests are deliberately public during testing and reuse a server-only single-image helper; neither test endpoint accesses orders or payments — allows no-code tester access while preserving paid-order generation gates.

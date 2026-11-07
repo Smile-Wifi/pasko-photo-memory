@@ -22,3 +22,7 @@
 - [x] Link Replicate and switch reference-photo editing to FLUX Kontext Pro, preserving the paid-order gate and private PNG storage.
 - [x] Pass 17 automated checks and generate a real Christmas sample PNG using the linked account.
 - [ ] Verify a paid order generates and reads back in the admin/customer screens; blocked because no admin account has been created yet.
+
+# Tester access
+- [x] Add a no-code Test Photo button beside payment methods, using the uploaded photo and selected template without changing orders or payments.
+- [x] Verify a real signed-out test generates and displays a downloadable photo; mobile has no overflow and 20 automated checks retain paid-order protections.
