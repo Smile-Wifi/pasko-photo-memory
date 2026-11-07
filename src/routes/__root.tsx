@@ -72,7 +72,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#16402b" },
-      { title: "XmasMagic PH – Old Photo. Magical Christmas!" },
+      { title: "Pasko Photo Magic – Balik Alaala sa Pasko" },
       { name: "description", content: "Turn one photo into five magical AI Christmas photos. ₱99 or ₱149 via GCash, Maya or bank transfer." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

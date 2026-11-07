@@ -13,10 +13,10 @@ export const Route = createFileRoute("/order/$reference")({
   validateSearch: (s: Record<string, unknown>): { t?: string } => (typeof s["t"] === "string" ? { t: s["t"] } : {}),
   head: () => ({
     meta: [
-      { title: "My Christmas Order – XmasMagic PH" },
-      { name: "description", content: "Your XmasMagic PH order status and Christmas photos." },
+      { title: "My Christmas Order – Pasko Photo Magic" },
+      { name: "description", content: "Your Pasko Photo Magic order status and Christmas photos." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "My Christmas Order – XmasMagic PH" },
+      { property: "og:title", content: "My Christmas Order – Pasko Photo Magic" },
       { property: "og:description", content: "Your Christmas photo order." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -85,7 +85,7 @@ function OrderPage() {
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       await Promise.all(order!.results.map(async (u, i) => zip.file(`${reference}-${i + 1}-${STYLES[i]?.key ?? "xmas"}.png`, await fetchBlob(u))));
-      saveBlob(await zip.generateAsync({ type: "blob" }), `${reference}-XmasMagicPH.zip`);
+      saveBlob(await zip.generateAsync({ type: "blob" }), `${reference}-PaskoPhotoMagic.zip`);
     } catch {
       toast.error("Could not create ZIP. Please download photos one by one.");
     } finally {
@@ -98,7 +98,7 @@ function OrderPage() {
       const blob = await fetchBlob(order!.results[0]!);
       const file = new File([blob], "xmasmagic.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: "My Christmas photo", text: "Made with XmasMagic PH 🎄" });
+        await navigator.share({ files: [file], title: "My Christmas photo", text: "Made with Pasko Photo Magic 🎄" });
       } else {
         toast.info("Your browser can't share photos directly. Download them and post on Facebook!");
       }

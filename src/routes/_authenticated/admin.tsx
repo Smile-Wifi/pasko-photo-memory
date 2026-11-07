@@ -22,10 +22,10 @@ import { PACKAGES, PAYMENT_METHODS, STATUS_LABEL, STYLES, peso, type OrderStatus
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard – XmasMagic PH" },
-      { name: "description", content: "Manage XmasMagic PH orders, payments and Christmas photos." },
+      { title: "Admin Dashboard – Pasko Photo Magic" },
+      { name: "description", content: "Manage Pasko Photo Magic orders, payments and Christmas photos." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin Dashboard – XmasMagic PH" },
+      { property: "og:title", content: "Admin Dashboard – Pasko Photo Magic" },
       { property: "og:description", content: "Order management." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

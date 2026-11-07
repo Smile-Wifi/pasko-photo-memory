@@ -11,9 +11,9 @@ import { normalizePhMobile } from "@/lib/catalog";
 export const Route = createFileRoute("/track")({
   head: () => ({
     meta: [
-      { title: "Track My Order – XmasMagic PH" },
-      { name: "description", content: "Check the status of your XmasMagic PH Christmas photo order with your reference number." },
-      { property: "og:title", content: "Track My Order – XmasMagic PH" },
+      { title: "Track My Order – Pasko Photo Magic" },
+      { name: "description", content: "Check the status of your Pasko Photo Magic Christmas photo order with your reference number." },
+      { property: "og:title", content: "Track My Order – Pasko Photo Magic" },
       { property: "og:description", content: "Check your Christmas photo order status." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

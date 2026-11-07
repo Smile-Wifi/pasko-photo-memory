@@ -4,9 +4,9 @@ import { LegalPage } from "@/components/layout/LegalPage";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms and Conditions – XmasMagic PH" },
-      { name: "description", content: "Terms for ordering AI Christmas photos from XmasMagic PH." },
-      { property: "og:title", content: "Terms and Conditions – XmasMagic PH" },
+      { title: "Terms and Conditions – Pasko Photo Magic" },
+      { name: "description", content: "Terms for ordering AI Christmas photos from Pasko Photo Magic." },
+      { property: "og:title", content: "Terms and Conditions – Pasko Photo Magic" },
       { property: "og:description", content: "Terms for ordering AI Christmas photos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

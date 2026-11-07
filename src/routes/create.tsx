@@ -18,9 +18,9 @@ export const Route = createFileRoute("/create")({
     s["pkg"] === "basic" || s["pkg"] === "premium" ? { pkg: s["pkg"] } : {},
   head: () => ({
     meta: [
-      { title: "Create My Xmas Photos – XmasMagic PH" },
+      { title: "Create My Xmas Photos – Pasko Photo Magic" },
       { name: "description", content: "Upload one photo, pick ₱99 or ₱149, and check out with GCash, Maya or bank transfer." },
-      { property: "og:title", content: "Create My Xmas Photos – XmasMagic PH" },
+      { property: "og:title", content: "Create My Xmas Photos – Pasko Photo Magic" },
       { property: "og:description", content: "One upload. Five magical Christmas photos." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

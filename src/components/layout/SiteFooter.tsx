@@ -32,7 +32,7 @@ export function SiteFooter() {
           </nav>
         </div>
         <div className="mt-10 border-t border-snow/15 pt-6 text-center text-sm text-pine-foreground/70">
-          Made with ❤️ in the Philippines 🇵🇭 · © {new Date().getFullYear()} XmasMagic PH
+          Made with ❤️ in the Philippines 🇵🇭 · © {new Date().getFullYear()} Pasko Photo Magic
         </div>
       </div>
     </footer>

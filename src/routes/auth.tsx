@@ -10,10 +10,10 @@ import { lovable } from "@/integrations/lovable";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Admin Sign In – XmasMagic PH" },
-      { name: "description", content: "Staff sign in for the XmasMagic PH admin dashboard." },
+      { title: "Admin Sign In – Pasko Photo Magic" },
+      { name: "description", content: "Staff sign in for the Pasko Photo Magic admin dashboard." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Admin Sign In – XmasMagic PH" },
+      { property: "og:title", content: "Admin Sign In – Pasko Photo Magic" },
       { property: "og:description", content: "Staff sign in." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -58,7 +58,7 @@ function AuthPage() {
   return (
     <section className="mx-auto max-w-sm px-4 py-16">
       <h1 className="text-center text-3xl font-bold text-pine">{mode === "signin" ? "Admin sign in" : "Create staff account"}</h1>
-      <p className="mt-2 text-center text-sm text-muted-foreground">For XmasMagic PH staff only. Customers don't need an account.</p>
+      <p className="mt-2 text-center text-sm text-muted-foreground">For Pasko Photo Magic staff only. Customers don't need an account.</p>
       <form onSubmit={submit} className="mt-8 space-y-4 rounded-3xl border border-border bg-card p-6 shadow-card">
         <div>
           <Label htmlFor="email">Email</Label>

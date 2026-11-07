@@ -4,10 +4,10 @@ import { Mail, MessageCircle, Clock } from "lucide-react";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact Us – XmasMagic PH" },
-      { name: "description", content: "Questions about your Christmas photo order? Contact the XmasMagic PH team." },
-      { property: "og:title", content: "Contact Us – XmasMagic PH" },
-      { property: "og:description", content: "Get help with your XmasMagic PH order." },
+      { title: "Contact Us – Pasko Photo Magic" },
+      { name: "description", content: "Questions about your Christmas photo order? Contact the Pasko Photo Magic team." },
+      { property: "og:title", content: "Contact Us – Pasko Photo Magic" },
+      { property: "og:description", content: "Get help with your Pasko Photo Magic order." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
