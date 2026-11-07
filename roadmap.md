@@ -11,3 +11,9 @@
 - [x] Implement upload → template → payment → five-photo generation sequence.
 - [x] Save the chosen template with the order and show it in payment and admin views.
 - [x] Test customer ordering end-to-end through pending payment and test the generation payment gate; no live generation or transfer performed.
+
+# Google Gemini integration
+- [x] Connect verified photo generation to the saved Gemini key without exposing credentials.
+- [x] Attempt a real sample photo edit: Google returns 429 with a zero free-tier image quota; do not retry or change providers.
+- [ ] Complete live generation after the owner enables Google image-generation billing/quota; authenticated order verification also needs the owner to sign in.
+- [x] Verify the homepage and admin sign-in gate, pass 12 automated checks including payment protection, and save the changes.
