@@ -1,9 +1,9 @@
 import original from "@/assets/style-original.jpg";
-import santa from "@/assets/style-santa.jpg";
-import family from "@/assets/style-family.jpg";
-import winter from "@/assets/style-winter.jpg";
-import lights from "@/assets/style-lights.jpg";
-import fashion from "@/assets/style-fashion.jpg";
+import santa from "@/assets/template-santa-v3.jpg.asset.json";
+import family from "@/assets/template-family-v3.jpg.asset.json";
+import winter from "@/assets/template-winter-v3.jpg.asset.json";
+import lights from "@/assets/template-lights-v3.jpg.asset.json";
+import fashion from "@/assets/template-fashion-v3.jpg.asset.json";
 
 export type PackageId = "basic" | "premium";
 export type PaymentMethod = "gcash" | "maya" | "bank";
@@ -16,37 +16,37 @@ export const STYLES = [
   {
     key: "santa",
     name: "Santa Claus Christmas",
-    image: santa as string | null,
+    image: santa.url as string | null,
     prompt:
-      "Transform this photo into a festive Santa Claus Christmas portrait: the person wears a classic red Santa hat and cozy red-and-white Christmas outfit, warm living room with fireplace and stockings, soft warm lighting.",
+      "Transform this photo into a warm Filipino Santa Claus Christmas portrait: everyone wears red Santa hats, women and girls in red Filipiniana dresses with gold embroidery, men in cream barong, cozy living room with a decorated Christmas tree, fireplace and stockings, warm golden lighting.",
   },
   {
     key: "family",
     name: "Christmas Family Portrait",
-    image: family,
+    image: family.url,
     prompt:
-      "Transform this photo into an elegant Christmas family-portrait style photo: seated beside a beautifully decorated Christmas tree with red and gold ornaments and wrapped gifts, warm golden light, professional studio quality.",
+      "Transform this photo into an elegant Filipino Christmas family portrait: seated together on a sofa in a capiz-window Filipino home with a glowing parol star, Christmas tree and fairy lights, red Filipiniana dresses and cream barong, warm professional studio quality.",
   },
   {
     key: "winter",
     name: "Winter Wonderland",
-    image: winter,
+    image: winter.url,
     prompt:
-      "Transform this photo into a winter wonderland portrait: the person wears a cozy white winter coat and knit scarf in a snowy pine forest with gently falling snow, soft natural light.",
+      "Transform this photo into a winter wonderland portrait: cozy white winter coats with fur trim over festive red outfits, holding warm mugs, in a snowy pine forest with gently falling snow, soft natural light.",
   },
   {
     key: "lights",
-    name: "Christmas Lights & Bokeh",
-    image: lights,
+    name: "Cozy Golden Christmas",
+    image: lights.url,
     prompt:
-      "Transform this photo into a dreamy night portrait with magical golden Christmas lights bokeh and glowing Filipino parol star lanterns in the background, warm cinematic lighting.",
+      "Transform this photo into a cozy golden Christmas portrait: wearing Santa hats, cream barong and red Filipiniana, holding warm mugs beside glowing candles, under a garland of golden fairy lights, pine cones and dried oranges, warm candlelit glow.",
   },
   {
     key: "fashion",
-    name: "Red & Green Christmas Fashion",
-    image: fashion,
+    name: "A Magical Filipino Christmas",
+    image: fashion.url,
     prompt:
-      "Transform this photo into a stylish red and green Christmas fashion portrait holding a wrapped gift box with a gold ribbon, festive studio backdrop with a Christmas tree and wreath.",
+      "Transform this photo into a magical Filipino Christmas portrait: standing in front of a tall golden Christmas tree in a traditional Filipino home with capiz windows, glowing parol star lanterns and poinsettias, red Filipiniana dresses and cream barong, warm festive lighting.",
   },
 ] as const;
 

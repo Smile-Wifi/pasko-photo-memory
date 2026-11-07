@@ -40,7 +40,7 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
   const done = slots.some(slot => slot.image || slot.error);
 
   return <>
-    <Button type="button" variant="outline" className="mt-4" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical />Test Photo</Button>
+    <Button type="button" variant="festive" size="lg" className="mt-4 h-16 w-full text-lg font-bold shadow-lg" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical className="size-6" />TEST PHOTO — Try 5 styles</Button>
     <Dialog open={open} onOpenChange={value => { if (!busy) setOpen(value); }}>
       <DialogContent className="max-h-[90svh] overflow-y-auto">
         <DialogHeader>

@@ -8,7 +8,7 @@ import { ORIGINAL_SAMPLE, PACKAGES, STYLES, DEFAULT_PRICES, peso, type PackageId
 import { siteDataQuery } from "@/lib/queries";
 import { useLang } from "@/lib/i18n";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import sampleArtwork from "@/assets/pasko-sample-transformations-v2.jpg.asset.json";
+import sampleArtwork from "@/assets/pasko-sample-transformations-v3.jpg.asset.json";
 import howItWorksArtwork from "@/assets/pasko-how-it-works.jpg.asset.json";
 
 function useStyleImages() {
