@@ -21,7 +21,7 @@ function Index() {
     <>
       <FestiveStudio />
       <HowItWorks />
-      <StyleGallery />
+      <StyleGallery artwork />
       <Faq />
     </>
   );
