@@ -42,7 +42,8 @@ Aim to preserve the uploaded subjects' recognizable faces, skin tones, ages, bod
 
 ## Real AI photo generation
 
-- Use the connected **Replicate** provider with the official SDK and **black-forest-labs/flux-kontext-pro** through the Lovable connector gateway.
+- Paid orders use the connected **Replicate** provider with the official SDK and **black-forest-labs/flux-kontext-pro** through the Lovable connector gateway.
+- Test photos (admin test dialog and the public checkout tester) use the app's built-in Lovable AI gateway with **google/gemini-3.1-flash-lite-image**, so testing never spends the owner's Replicate balance.
 - Keep credentials and provider requests server-side. Never expose secrets to the browser or place them in this document.
 - Disable automatic replay of billed generation requests. Poll an existing prediction rather than creating another prediction on a polling retry.
 - Generate one style per server call to avoid long-running requests.
@@ -58,7 +59,7 @@ Aim to preserve the uploaded subjects' recognizable faces, skin tones, ages, bod
 - Show a loading state, prevent duplicate clicks during generation, and display failures clearly.
 - Test generation must not create or modify orders, verify payments, or bypass the paid five-photo generation gate.
 - Retain the separate admin-only photo-test control with server-verified admin access.
-- Public tester access is intentional only for the unfinished testing phase; review it before launching because each generation can consume the owner's Replicate balance.
+- Public tester access is intentional only for the unfinished testing phase; review it before launching because each generation consumes workspace AI credits.
 
 ## Customer results
 
@@ -102,4 +103,4 @@ The owner requested Christmas music including the chorus of **Christmas in Our H
 
 ## Known verification limit
 
-Real Replicate photo generation and the signed-out checkout photo-test flow have succeeded. Full paid-order generation and customer readback remain unverified until an admin account is available. Preserve that distinction when reporting progress.
+Real Replicate photo generation and the signed-out checkout photo-test flow (built-in AI gateway) have both succeeded live. Full paid-order generation and customer readback remain unverified until an admin account is available. Preserve that distinction when reporting progress.

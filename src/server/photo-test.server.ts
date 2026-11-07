@@ -2,8 +2,13 @@ import { STYLES, IDENTITY_RULE } from "@/lib/catalog";
 
 // Test photos use Lovable's built-in AI gateway so testers never spend the
 // owner's Replicate balance. Paid orders still generate through Replicate.
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/images/generations";
 const TEST_IMAGE_MODEL = "google/gemini-3.1-flash-lite-image";
+
+type ImagesResponse = {
+  data?: { b64_json?: unknown }[];
+  candidates?: { content?: { parts?: { inlineData?: { data?: unknown } }[] } }[];
+};
 
 export async function generateTestPhoto(photo: string, index: number) {
   const match = /^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/.exec(photo);
@@ -19,16 +24,16 @@ export async function generateTestPhoto(photo: string, index: number) {
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       model: TEST_IMAGE_MODEL,
-      messages: [
+      contents: [
         {
           role: "user",
-          content: [
-            { type: "text", text: `${style.prompt} ${IDENTITY_RULE}` },
-            { type: "image_url", image_url: { url: photo } },
+          parts: [
+            { text: `${style.prompt} ${IDENTITY_RULE}` },
+            { inlineData: { mimeType: match[1], data: match[2] } },
           ],
         },
       ],
-      modalities: ["image", "text"],
+      generationConfig: { responseModalities: ["TEXT", "IMAGE"] },
     }),
   });
   if (!response.ok) {
@@ -37,10 +42,9 @@ export async function generateTestPhoto(photo: string, index: number) {
     if (response.status === 429) throw new Error("Too many test requests. Wait a moment and try again.");
     throw new Error(`Photo test failed (${response.status}): ${body}`);
   }
-  const data: unknown = await response.json();
-  const image = (data as { choices?: { message?: { images?: { image_url?: { url?: unknown } }[] } }[] })
-    ?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-  if (typeof image !== "string" || !image.startsWith("data:image/"))
-    throw new Error("The AI returned no image. Please try again.");
-  return { image };
+  const data = (await response.json()) as ImagesResponse;
+  const b64 = data.data?.[0]?.b64_json ?? data.candidates?.[0]?.content?.parts?.find(p => typeof p.inlineData?.data === "string")?.inlineData?.data;
+  if (typeof b64 !== "string" || !b64) throw new Error("The AI returned no image. Please try again.");
+  const mime = b64.startsWith("/9j/") ? "image/jpeg" : "image/png";
+  return { image: `data:${mime};base64,${b64}` };
 }

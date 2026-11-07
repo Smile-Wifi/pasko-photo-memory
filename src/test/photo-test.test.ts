@@ -4,8 +4,8 @@ vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth:
 vi.mock("@tanstack/react-start", () => ({ createServerFn: () => ({ middleware() { return this; }, inputValidator() { return this; }, handler(fn: unknown) { return fn; } }) }));
 import { testPhoto, testCheckoutPhoto } from "@/lib/api/photo-test.functions";
 
-const GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const okImage = () => Response.json({ choices: [{ message: { images: [{ image_url: { url: "data:image/png;base64,AQID" } }] } }] });
+const GATEWAY = "https://ai.gateway.lovable.dev/v1/images/generations";
+const okImage = () => Response.json({ data: [{ b64_json: "AQID" }] });
 
 function setup() {
   vi.stubEnv("LOVABLE_API_KEY", "test-key");
@@ -16,7 +16,7 @@ function setup() {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 const promptOf = (fetcher: ReturnType<typeof setup>, call: number) =>
-  JSON.parse(fetcher.mock.calls[call]?.[1]?.body as string).messages[0].content[0].text as string;
+  JSON.parse(fetcher.mock.calls[call]?.[1]?.body as string).contents[0].parts[0].text as string;
 
 const handler = testPhoto as unknown as (input: { data: { photo: string; index: number }; context: { userId: string; supabase: { rpc: ReturnType<typeof vi.fn> } } }) => Promise<{ image: string }>;
 describe("admin photo tests", () => {
@@ -66,7 +66,7 @@ describe("checkout tester access", () => {
   });
   it("rejects an empty AI result rather than claiming success", async () => {
     const fetcher = setup();
-    fetcher.mockReset().mockResolvedValue(Response.json({ choices: [{ message: {} }] }));
+    fetcher.mockReset().mockResolvedValue(Response.json({ data: [] }));
     await expect(checkoutHandler({ data: { photo: "data:image/jpeg;base64,AQID", index: 0 } })).rejects.toThrow("no image");
   });
 });

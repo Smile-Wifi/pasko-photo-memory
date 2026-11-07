@@ -39,7 +39,8 @@ use the editor.
 - The homepage Christmas studio presentation lives in a dedicated section and reads the shared catalog and site settings, so visual redesigns do not change checkout rules.
 - Checkout uses a gated photo/template/payment sequence; the stored template is generated first, followed by the remaining catalog styles, so every order still includes five photos.
 - Generation and retries require a stored admin payment-verification timestamp, not just a failed/processing status, to prevent unpaid generation.
-- Photo editing uses the official Replicate SDK through the connector gateway with the linked connection key; transport disables automatic replay and results remain private PNGs — honors the owner's provider choice without duplicating billed work.
+- Paid-order photo editing uses the official Replicate SDK through the connector gateway with the linked connection key; transport disables automatic replay and results remain private PNGs — honors the owner's provider choice without duplicating billed work.
+- Test photos (admin dialog and public checkout tester) use the Lovable AI gateway (`/v1/images/generations`, generate-content format) instead of Replicate — keeps tester traffic off the owner's Replicate balance.
 - Admin photo tests require server-verified admin access and return transient images without touching orders or payments — permits diagnostics without bypassing customer payment gates.
 - Checkout photo tests are deliberately public during testing and reuse a server-only single-image helper; neither test endpoint accesses orders or payments — allows no-code tester access while preserving paid-order generation gates.
 - Template updates retain stored catalog keys and indices while replacing shared previews and scene prompts — keeps existing orders compatible and tester/order generation consistent.
