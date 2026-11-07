@@ -1,11 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { templateSchema } from "@/lib/order-process";
 
 const createOrderInput = z.object({
   fullName: z.string().trim().min(2).max(100),
   mobile: z.string().trim().regex(/^\+639\d{9}$/),
   email: z.string().trim().email().max(255).optional().or(z.literal("")),
   pkg: z.enum(["basic", "premium"]),
+  template: templateSchema,
   paymentMethod: z.enum(["gcash", "maya", "bank"]),
   photo: z.string().max(15_000_000), // data URL
 });
@@ -47,6 +49,7 @@ export const createOrder = createServerFn({ method: "POST" })
         mobile: data.mobile,
         email: data.email || null,
         package: data.pkg,
+        template: data.template,
         amount,
         payment_method: data.paymentMethod,
         original_path: path,
@@ -71,7 +74,7 @@ export const getCustomerOrder = createServerFn({ method: "POST" })
     const { signPaths, getSettings, ORDER_BUCKET, MEDIA_BUCKET } = await import("@/server/storage.server");
     const { data: o } = await supabaseAdmin
       .from("orders")
-      .select("reference, full_name, package, amount, payment_method, payment_reference, status, original_path, result_paths, created_at, expires_at, access_token")
+      .select("reference, full_name, package, template, amount, payment_method, payment_reference, status, original_path, result_paths, created_at, expires_at, access_token")
       .eq("reference", data.reference)
       .maybeSingle();
     if (!o || o.access_token !== data.token) return null;
@@ -87,6 +90,7 @@ export const getCustomerOrder = createServerFn({ method: "POST" })
       reference: o.reference,
       fullName: o.full_name,
       pkg: o.package as "basic" | "premium",
+      template: o.template,
       amount: o.amount,
       paymentMethod: o.payment_method as "gcash" | "maya" | "bank",
       paymentReference: o.payment_reference,

@@ -120,6 +120,7 @@ function OrderPage() {
         <p className="mt-2 text-sm text-pine-foreground/80">
           {PACKAGES[order.pkg].name} · {peso(order.amount)} · {PAYMENT_METHODS[order.paymentMethod]}
         </p>
+        <p className="mt-2 text-sm text-pine-foreground/80">Template: {STYLES.find(s => s.key === order.template)?.name} · All 5 styles included</p>
         {order.status !== "failed" && (
           <ol className="mt-6 grid grid-cols-4 gap-2 text-center text-[11px] sm:text-xs">
             {STEPS.map((s, i) => (

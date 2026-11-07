@@ -47,9 +47,11 @@ export type Database = {
           package: string
           payment_method: string
           payment_reference: string | null
+          payment_verified_at: string | null
           reference: string
           result_paths: string[]
           status: Database["public"]["Enums"]["order_status"]
+          template: string
           updated_at: string
         }
         Insert: {
@@ -66,9 +68,11 @@ export type Database = {
           package: string
           payment_method: string
           payment_reference?: string | null
+          payment_verified_at?: string | null
           reference: string
           result_paths?: string[]
           status?: Database["public"]["Enums"]["order_status"]
+          template?: string
           updated_at?: string
         }
         Update: {
@@ -85,9 +89,11 @@ export type Database = {
           package?: string
           payment_method?: string
           payment_reference?: string | null
+          payment_verified_at?: string | null
           reference?: string
           result_paths?: string[]
           status?: Database["public"]["Enums"]["order_status"]
+          template?: string
           updated_at?: string
         }
         Relationships: []

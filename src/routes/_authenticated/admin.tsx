@@ -18,6 +18,7 @@ import {
   getAdminSettings, saveSettings, uploadMedia, deleteSample,
 } from "@/lib/api/admin.functions";
 import { PACKAGES, PAYMENT_METHODS, STATUS_LABEL, STYLES, peso, type OrderStatus } from "@/lib/catalog";
+import { canGenerate as paymentAllowsGeneration, generationOrder } from "@/lib/order-process";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -190,7 +191,7 @@ function OrderDetail({ order, onChanged, onClose }: { order: AdminOrder; onChang
   const { data: m, refetch } = useQuery({ queryKey: ["order-media", order.id, order.result_paths.join()], queryFn: () => media({ data: { id: order.id } }) });
   const [genIdx, setGenIdx] = useState<number | null>(null);
   const status = order.status as OrderStatus;
-  const canGenerate = ["payment_verified", "processing", "failed"].includes(status);
+  const canGenerate = paymentAllowsGeneration(status, order.payment_verified_at);
 
   async function change(s: OrderStatus) {
     try {
@@ -203,7 +204,7 @@ function OrderDetail({ order, onChanged, onClose }: { order: AdminOrder; onChang
   }
 
   async function generateAll(onlyMissing: boolean) {
-    for (let i = 0; i < 5; i++) {
+    for (const i of generationOrder(order.template)) {
       if (onlyMissing && order.result_paths[i]) continue;
       setGenIdx(i);
       try {
@@ -233,6 +234,7 @@ function OrderDetail({ order, onChanged, onClose }: { order: AdminOrder; onChang
         <p><b>Mobile:</b> {order.mobile}</p>
         <p><b>Email:</b> {order.email ?? "—"}</p>
         <p><b>Package:</b> {PACKAGES[order.package as "basic"].name} ({peso(order.amount)})</p>
+        <p><b>Template:</b> {STYLES.find(s => s.key === order.template)?.name}</p>
         <p><b>Method:</b> {PAYMENT_METHODS[order.payment_method as "gcash"]}</p>
         <p><b>Payment ref:</b> {order.payment_reference ?? <span className="text-destructive">not submitted</span>}</p>
         <p className="sm:col-span-2"><b>Expires:</b> {new Date(order.expires_at).toLocaleDateString("en-PH")}</p>

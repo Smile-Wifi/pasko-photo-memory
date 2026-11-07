@@ -75,9 +75,9 @@ export function Hero() {
 
 const STEPS = [
   { icon: Upload, title: "Upload your old photo", text: "Any clear photo of a face — old, faded or new.", img: ORIGINAL_SAMPLE },
-  { icon: Gift, title: "Choose your package", text: "₱99 Basic or ₱149 with music & slideshow.", img: null },
-  { icon: Sparkles, title: "AI creates 5 Christmas styles", text: "We transform your photo into 5 magical looks.", img: STYLES[1].image },
-  { icon: Download, title: "Download & share", text: "Save each photo or all as ZIP. Share on Facebook!", img: STYLES[3].image },
+  { icon: Gift, title: "Choose your template", text: "Pick your first Christmas look. All five styles are included.", img: STYLES[1].image },
+  { icon: Check, title: "Payment", text: "Choose ₱99 Basic or ₱149 with music. Pay with GCash, Maya or bank transfer.", img: null },
+  { icon: Sparkles, title: "Generate 5 fotos", text: "After payment verification, we create five Christmas photos to download and share.", img: STYLES[3].image },
 ];
 
 export function HowItWorks() {

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { canGenerate } from "@/lib/order-process";
 
 type Ctx = { supabase: { rpc: (fn: "has_role", args: { _user_id: string; _role: "admin" }) => PromiseLike<{ data: boolean | null }> }; userId: string };
 
@@ -25,7 +26,7 @@ export const listOrders = createServerFn({ method: "POST" })
     await assertAdmin(context as unknown as Ctx);
     let q = context.supabase
       .from("orders")
-      .select("id, reference, access_token, full_name, mobile, email, package, amount, payment_method, payment_reference, status, original_path, result_paths, created_at, expires_at, admin_note")
+      .select("id, reference, access_token, full_name, mobile, email, package, template, payment_verified_at, amount, payment_method, payment_reference, status, original_path, result_paths, created_at, expires_at, admin_note")
       .order("created_at", { ascending: false })
       .limit(500);
     if (data.search) {
@@ -69,12 +70,15 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     await assertAdmin(context as unknown as Ctx);
-    const { data: o } = await context.supabase.from("orders").select("result_paths").eq("id", data.id).single();
+    const { data: o } = await context.supabase.from("orders").select("result_paths, payment_verified_at").eq("id", data.id).single();
+    if (!o) throw new Error("Order not found");
+    if (["processing", "completed"].includes(data.status) && !o.payment_verified_at)
+      throw new Error("Verify the payment before generating photos.");
     if (data.status === "completed" && (o?.result_paths.filter(Boolean).length ?? 0) < 5)
       throw new Error("Generate all 5 photos before marking as Completed.");
     const { error } = await context.supabase
       .from("orders")
-      .update({ status: data.status, admin_note: data.note ?? null, updated_at: new Date().toISOString() })
+      .update({ status: data.status, payment_verified_at: data.status === "payment_verified" ? new Date().toISOString() : data.status === "pending_payment" ? null : o.payment_verified_at, admin_note: data.note ?? null, updated_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -91,9 +95,9 @@ export const generateStylePhoto = createServerFn({ method: "POST" })
     const { editPhoto } = await import("@/server/ai.server");
     const { STYLES, IDENTITY_RULE } = await import("@/lib/catalog");
 
-    const { data: o } = await supabaseAdmin.from("orders").select("id, reference, status, original_path, result_paths").eq("id", data.id).single();
+    const { data: o } = await supabaseAdmin.from("orders").select("id, reference, status, payment_verified_at, original_path, result_paths").eq("id", data.id).single();
     if (!o) throw new Error("Order not found");
-    if (!["payment_verified", "processing", "failed"].includes(o.status))
+    if (!canGenerate(o.status, o.payment_verified_at))
       throw new Error("Verify the payment before generating photos.");
 
     await supabaseAdmin.from("orders").update({ status: "processing", updated_at: new Date().toISOString() }).eq("id", o.id);
@@ -101,7 +105,8 @@ export const generateStylePhoto = createServerFn({ method: "POST" })
     const dl = await supabaseAdmin.storage.from(ORDER_BUCKET).download(o.original_path);
     if (dl.error || !dl.data) throw new Error("Original photo is missing");
 
-    const style = STYLES[data.index]!;
+    const style = STYLES[data.index];
+    if (!style) throw new Error("Invalid template");
     try {
       const png = await editPhoto(dl.data, `${style.prompt} ${IDENTITY_RULE}`);
       const path = `results/${o.reference}/${data.index + 1}-${style.key}.png`;
