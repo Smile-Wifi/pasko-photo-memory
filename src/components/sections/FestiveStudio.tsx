@@ -1,9 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Camera, Check, Heart, Music, ShieldCheck, Smartphone, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Camera, Check, Music, ShieldCheck, Smartphone, Sparkles, Zap } from "lucide-react";
 import backdrop from "@/assets/christmas-studio.jpg";
+import studioArtwork from "@/assets/pasko-christmas-studio.jpg.asset.json";
 import { Button } from "@/components/ui/button";
-import { DEFAULT_PRICES, ORIGINAL_SAMPLE, PACKAGES, STYLES, peso, type PackageId } from "@/lib/catalog";
+import { DEFAULT_PRICES, PACKAGES, peso, type PackageId } from "@/lib/catalog";
 import { siteDataQuery } from "@/lib/queries";
 
 const benefits = [
@@ -20,32 +21,9 @@ export function FestiveStudio() {
   return (
     <section className="christmas-studio relative isolate overflow-hidden">
       <img src={backdrop} alt="" width={1536} height={1024} fetchPriority="high" className="studio-backdrop absolute inset-0 -z-10 h-full w-full object-cover" />
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-6 md:px-8 md:pt-10">
-        <div className="studio-intro grid items-center gap-5 md:grid-cols-[0.85fr_1.15fr] md:gap-8">
-          <div className="studio-copy text-center md:text-left">
-            <p className="mb-2 flex items-center justify-center gap-2 text-xs font-bold uppercase text-christmas md:justify-start"><Sparkles className="size-4" /> Balik Alaala sa Pasko</p>
-            <h1 className="text-2xl font-extrabold text-pine md:text-4xl">Pasko <span className="text-primary">Photo</span> Magic</h1>
-            <h2 className="studio-headline mt-3 font-extrabold leading-[1.06] text-christmas">Old Foto,<br /><span className="text-primary">Magical Xmas!</span></h2>
-            <div className="studio-swoosh mx-auto mt-2 h-2 w-44 rounded-t-[100%] border-t-4 border-gold md:mx-0 md:w-64" />
-            <p className="mx-auto mt-4 max-w-sm text-base font-semibold leading-snug text-foreground md:mx-0 md:text-xl">Turn your old photo into<br /><span className="font-extrabold text-primary">5 amazing</span> Christmas photos.</p>
-            <p className="studio-ribbon mx-auto mt-5 max-w-xs bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground md:mx-0">For family, friends & unforgettable memories! <Heart className="ml-1 inline size-4" /></p>
-          </div>
-          <div className="photo-collage relative mx-auto w-full max-w-xl" aria-label="Original photo and five sample Christmas transformations">
-            <span className="magic-seal absolute right-0 top-0 z-10 flex size-20 flex-col items-center justify-center rounded-full border-2 border-gold bg-primary text-center font-bold leading-tight text-primary-foreground shadow-card md:size-24"><span className="text-3xl text-gold">5</span><span className="text-xs">Magical<br />Xmas Photos!</span></span>
-            <figure className="original-polaroid absolute left-[2%] top-[26%] z-10 w-[29%] -rotate-12 bg-snow p-1.5 shadow-photo md:p-2">
-              <img src={ORIGINAL_SAMPLE} alt="Original old photo" width={640} height={800} className="aspect-[4/5] w-full object-cover" />
-              <figcaption className="py-1 text-center text-[10px] font-semibold text-pine md:text-xs">Your old photo</figcaption>
-            </figure>
-            <ArrowRight aria-hidden="true" className="absolute left-[24%] top-[45%] z-20 size-12 -rotate-12 rounded-full bg-snow/80 p-1 text-primary md:size-16" />
-            <div className="absolute left-[37%] right-[16%] top-[5%] grid grid-cols-2 gap-2">
-              {STYLES.slice(0, 2).map((style, i) => <Photo key={style.key} style={style} src={data?.samples.find(s => s.style === style.name)?.url ?? style.image} rotation={i === 0 ? "-rotate-6" : "rotate-6"} />)}
-            </div>
-            <div className="absolute bottom-[5%] left-[31%] right-[1%] grid grid-cols-3 gap-2">
-              {STYLES.slice(2).map((style, i) => <Photo key={style.key} style={style} src={data?.samples.find(s => s.style === style.name)?.url ?? style.image} rotation={i === 0 ? "-rotate-6" : i === 1 ? "rotate-3" : "rotate-[9deg]"} />)}
-            </div>
-            <p className="absolute bottom-0 right-[4%] text-[10px] font-medium text-muted-foreground">Illustrative samples · Actual results may vary</p>
-          </div>
-        </div>
+      <div className="mx-auto max-w-6xl px-4 pb-8 md:px-8">
+        <h1 className="sr-only">Pasko Photo Magic – Balik Alaala sa Pasko</h1>
+        <img src={studioArtwork.url} alt="Pasko Photo Magic. Balik Alaala sa Pasko. Old Foto, Magical Xmas! Turn your old photo into 5 amazing Christmas photos. Original portrait beside five illustrative Christmas transformations. Actual results may vary." width={816} height={768} fetchPriority="high" className="studio-artwork mx-auto block h-auto w-full object-contain" />
         <div className="mx-auto mt-6 grid max-w-3xl grid-cols-2 gap-3 md:mt-7 md:gap-6">
           {(["basic", "premium"] as PackageId[]).map(id => {
             const premium = id === "premium";
@@ -70,9 +48,4 @@ export function FestiveStudio() {
       </div>
     </section>
   );
-}
-
-function Photo({ style, src, rotation }: { style: (typeof STYLES)[number]; src: string | null; rotation: string }) {
-  if (!src) return null;
-  return <figure className={`bg-snow p-1 shadow-photo md:p-1.5 ${rotation}`}><img src={src} alt={style.name} width={640} height={800} className="aspect-[4/5] w-full object-cover" /></figure>;
 }
