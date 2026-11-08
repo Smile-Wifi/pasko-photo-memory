@@ -1,3 +1,4 @@
+import { deliverFile, dataUrlToBlob } from "@/lib/download";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, FlaskConical, LoaderCircle } from "lucide-react";
@@ -62,8 +63,8 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
                   </div>
                 )}
                 {slot.image && (
-                  <Button asChild variant="outline" size="sm" className="w-full">
-                    <a href={slot.image} download={`pasko-test-${style.key}.png`}><Download />Download</a>
+                  <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => void deliverFile(dataUrlToBlob(slot.image!), `pasko-test-${style.key}.png`)}>
+                    <Download />Save photo
                   </Button>
                 )}
               </div>

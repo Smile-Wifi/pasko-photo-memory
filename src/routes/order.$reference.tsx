@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { deliverFile, downloadBlob } from "@/lib/download";
 import { toast } from "sonner";
 import { Copy, Download, FileArchive, Hourglass, Loader2, Share2, ShieldCheck, Sparkles, XCircle, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,13 +33,7 @@ async function fetchBlob(url: string) {
   if (!r.ok) throw new Error("Download failed");
   return r.blob();
 }
-function saveBlob(blob: Blob, name: string) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-}
+const saveBlob = downloadBlob;
 
 function OrderPage() {
   const { reference } = Route.useParams();
@@ -53,6 +48,17 @@ function OrderPage() {
   const [payRef, setPayRef] = useState("");
   const [sending, setSending] = useState(false);
   const [zipping, setZipping] = useState(false);
+  // Preload photos so a tap can save instantly — iPhone blocks saves that wait on the network.
+  const [blobs, setBlobs] = useState<Record<string, Blob>>({});
+  const resultKey = order?.results?.join("|") ?? "";
+  useEffect(() => {
+    if (!resultKey) return;
+    let cancelled = false;
+    resultKey.split("|").forEach((u) => {
+      fetchBlob(u).then((b) => { if (!cancelled) setBlobs((m) => ({ ...m, [u]: b })); }).catch(() => {});
+    });
+    return () => { cancelled = true; };
+  }, [resultKey]);
 
   if (!t) return <Missing />;
   if (isLoading) return <div className="flex min-h-[50vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -84,7 +90,7 @@ function OrderPage() {
     try {
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
-      await Promise.all(order!.results.map(async (u, i) => zip.file(`${reference}-${i + 1}-${STYLES[i]?.key ?? "xmas"}.png`, await fetchBlob(u))));
+      await Promise.all(order!.results.map(async (u, i) => zip.file(`${reference}-${i + 1}-${STYLES[i]?.key ?? "xmas"}.png`, blobs[u] ?? (await fetchBlob(u)))));
       saveBlob(await zip.generateAsync({ type: "blob" }), `${reference}-PaskoPhotoMagic.zip`);
     } catch {
       toast.error("Could not create ZIP. Please download photos one by one.");
@@ -95,7 +101,8 @@ function OrderPage() {
 
   async function shareNative() {
     try {
-      const blob = await fetchBlob(order!.results[0]!);
+      const first = order!.results[0]!;
+      const blob = blobs[first] ?? (await fetchBlob(first));
       const file = new File([blob], "xmasmagic.png", { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         await navigator.share({ files: [file], title: "My Christmas photo", text: "Made with Pasko Photo Magic 🎄" });
@@ -196,7 +203,7 @@ function OrderPage() {
                 <img src={u} alt={STYLES[i]?.name} loading="lazy" className="aspect-[2/3] w-full object-cover" />
                 <div className="flex items-center justify-between gap-2 p-3">
                   <p className="line-clamp-1 text-xs font-semibold text-pine">{STYLES[i]?.name}</p>
-                  <Button size="icon" variant="ghost" aria-label="Download" onClick={async () => saveBlob(await fetchBlob(u), `${reference}-${i + 1}.png`)}>
+                  <Button size="icon" variant="ghost" aria-label="Download" disabled={!blobs[u]} onClick={() => void deliverFile(blobs[u]!, `${reference}-${i + 1}.png`)}>
                     <Download />
                   </Button>
                 </div>
