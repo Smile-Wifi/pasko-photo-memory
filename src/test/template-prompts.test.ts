@@ -6,6 +6,12 @@ describe("Owner's five Christmas scenes", () => {
   it("uses Simbang Gabi church and lantern instructions for the stored santa style", () => {
     expect(STYLES.find(s => s.key === "santa")?.prompt).toMatch(/Simbang Gabi.*Filipino stone church.*handheld lanterns/);
   });
+  it("dresses the Simbang Gabi style in casual mass clothes instead of barong", () => {
+    const prompt = STYLES.find(s => s.key === "santa")?.prompt ?? "";
+    expect(prompt).toContain("casual, modest Simbang Gabi mass-outing clothes");
+    expect(prompt).toContain("No barong Tagalog");
+    expect(prompt).toContain("no Filipiniana gowns");
+  });
   it("uses Snow forest and winter coats for the stored winter style", () => {
     expect(STYLES.find(s => s.key === "winter")?.prompt).toMatch(/Snow winter portrait.*pine forest.*winter coats/);
   });

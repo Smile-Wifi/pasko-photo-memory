@@ -1,5 +1,5 @@
 import original from "@/assets/style-original.jpg";
-import santa from "@/assets/template-simbang.jpg.asset.json";
+import santa from "@/assets/template-simbang-casual.jpg";
 import family from "@/assets/template-pajama.jpg.asset.json";
 import winter from "@/assets/template-snow.jpg.asset.json";
 import lights from "@/assets/template-street.jpg.asset.json";
@@ -16,9 +16,9 @@ export const STYLES = [
   {
     key: "santa",
      name: "Simbang Gabi",
-    image: santa.url as string | null,
+    image: santa,
     prompt:
-      "Transform the uploaded subjects into a photorealistic Simbang Gabi Christmas portrait outside a historic Filipino stone church at dusk. Show a cobblestone path, glowing parol star lanterns overhead, warm handheld lanterns, and soft golden church lights. Dress men and boys in cream embroidered barong and dark trousers, and women and girls in elegant cream and champagne Filipiniana dresses. Keep the uploaded subjects together as the main focus, with a softly out-of-focus festive church courtyard behind them. No Santa hats, snow, captions, or watermarks.",
+      "Transform the uploaded subjects into a photorealistic Simbang Gabi Christmas portrait outside a historic Filipino stone church at dusk. Show a cobblestone path, glowing parol star lanterns overhead, warm handheld lanterns, and soft golden church lights. Dress everyone in casual, modest Simbang Gabi mass-outing clothes: men and boys in plain collared polo or button-up shirts with neat trousers, women and girls in simple casual dresses or blouses with skirts. Keep the outfits relaxed and everyday, like a family walking to early morning mass. No barong Tagalog, no Filipiniana gowns, no formal embroidered traditional wear, no Santa hats, no snow, no captions, no watermarks.",
   },
   {
     key: "family",
