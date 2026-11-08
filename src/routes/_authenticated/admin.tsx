@@ -1,3 +1,4 @@
+import { blockIfOffline } from "@/lib/offline";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -205,6 +206,7 @@ function OrderDetail({ order, onChanged, onClose }: { order: AdminOrder; onChang
   }
 
   async function generateAll(onlyMissing: boolean) {
+    if (blockIfOffline("generate")) return;
     for (const i of generationOrder(order.template)) {
       if (onlyMissing && order.result_paths[i]) continue;
       setGenIdx(i);

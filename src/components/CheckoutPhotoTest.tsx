@@ -1,3 +1,4 @@
+import { blockIfOffline } from "@/lib/offline";
 import { deliverFile, dataUrlToBlob } from "@/lib/download";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -22,7 +23,7 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
   const order = [first < 0 ? 0 : first, ...STYLES.map((_, i) => i).filter(i => i !== (first < 0 ? 0 : first))];
 
   async function generate() {
-    if (busy) return;
+    if (busy || blockIfOffline("generate")) return;
     setBusy(true);
     setSlots(emptySlots());
     for (const index of order) {

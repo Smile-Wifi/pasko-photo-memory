@@ -44,3 +44,5 @@ use the editor.
 - Admin photo tests require server-verified admin access and return transient images without touching orders or payments — permits diagnostics without bypassing customer payment gates.
 - Checkout photo tests are deliberately public during testing and reuse a server-only single-image helper; neither test endpoint accesses orders or payments — allows no-code tester access while preserving paid-order generation gates.
 - Template updates retain stored catalog keys and indices while replacing shared previews and scene prompts — keeps existing orders compatible and tester/order generation consistent.
+
+- Offline support uses vite-plugin-pwa generateSW (outDir dist/client) registered only from `src/lib/pwa.ts`, which refuses dev/preview/iframe hosts; only built static assets are precached and pages are NetworkFirst, never photos or API data — keeps previews fresh and customer images private.

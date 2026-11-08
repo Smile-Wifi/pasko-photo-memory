@@ -1,3 +1,4 @@
+import { blockIfOffline } from "@/lib/offline";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -61,6 +62,7 @@ function CreatePage() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (step >= 3 && blockIfOffline("order")) return;
     if (step < 3) {
       if (canAdvance(step, Boolean(photo), template)) setStep(step + 1);
       return;

@@ -1,3 +1,4 @@
+import { blockIfOffline } from "@/lib/offline";
 import { useRef, useState } from "react";
 import { Camera, ImagePlus, RefreshCw, Trash2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export function PhotoUploader({ value, onChange }: { value: PreparedPhoto | null
 
   async function handle(file: File | undefined) {
     if (!file) return;
+    if (blockIfOffline("upload")) return;
     setError(null);
     const err = validatePhoto(file);
     if (err) return setError(err);
