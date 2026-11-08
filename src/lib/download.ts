@@ -33,3 +33,16 @@ export function dataUrlToBlob(dataUrl: string): Blob {
   for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
   return new Blob([bytes], { type: mime });
 }
+
+/** Messenger, Facebook, Instagram and similar in-app browsers. */
+export function isInAppBrowser(ua = typeof navigator !== "undefined" ? navigator.userAgent : "") {
+  return /FBAN|FBAV|FB_IAB|FBIOS|Messenger|MessengerForiOS|Instagram|Line\/|MicroMessenger|TikTok|musical_ly|Bytedance|Snapchat|Twitter/i.test(ua);
+}
+export function isIOSDevice(ua = typeof navigator !== "undefined" ? navigator.userAgent : "") {
+  const touchMac = typeof navigator !== "undefined" && ua.includes("Macintosh") && navigator.maxTouchPoints > 1;
+  return /iPhone|iPad|iPod/i.test(ua) || touchMac;
+}
+/** Where normal downloads are unreliable and long-press instructions should be shown instead. */
+export function needsLongPressSave(ua?: string) {
+  return isIOSDevice(ua) || isInAppBrowser(ua);
+}

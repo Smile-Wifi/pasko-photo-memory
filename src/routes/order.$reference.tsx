@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { deliverFile, downloadBlob } from "@/lib/download";
+import { deliverFile, downloadBlob, isInAppBrowser, needsLongPressSave } from "@/lib/download";
+import { SaveImageSheet, type SaveTarget } from "@/components/SaveImageSheet";
 import { toast } from "sonner";
 import { Copy, Download, FileArchive, Hourglass, Loader2, Share2, ShieldCheck, Sparkles, XCircle, Facebook, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ function OrderPage() {
   const [sending, setSending] = useState(false);
   const [zipping, setZipping] = useState(false);
   const [zipBlob, setZipBlob] = useState<Blob | null>(null);
+  const [saveTarget, setSaveTarget] = useState<SaveTarget>(null);
   // Preload photos so a tap can save instantly — iPhone blocks saves that wait on the network.
   const [blobs, setBlobs] = useState<Record<string, Blob>>({});
   const resultKey = order?.results?.join("|") ?? "";
@@ -104,6 +106,12 @@ function OrderPage() {
 
   const allReady = order.results.length > 0 && order.results.every((u) => blobs[u]);
   function saveAllToPhotos() {
+    if (isInAppBrowser()) {
+      const u = order!.results[0]!;
+      setSaveTarget({ src: u, blob: blobs[u], name: `${reference}-1.png` });
+      toast.info("Save each photo with a long press. / I-save ang bawat photo sa matagal na pagpindot.");
+      return;
+    }
     const files = order!.results.map((u, i) => new File([blobs[u]!], `${reference}-${i + 1}.png`, { type: "image/png" }));
     const touch = matchMedia("(pointer: coarse)").matches;
     if (touch && navigator.canShare?.({ files })) {
@@ -130,6 +138,7 @@ function OrderPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
+      <SaveImageSheet target={saveTarget} onClose={() => setSaveTarget(null)} />
       <div className="rounded-3xl bg-festive p-6 text-pine-foreground shadow-card">
         <p className="text-xs uppercase tracking-widest text-gold">Order reference</p>
         <div className="mt-1 flex flex-wrap items-center gap-3">
@@ -219,10 +228,10 @@ function OrderPage() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {order.results.map((u, i) => (
               <div key={u} className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-                <img src={u} alt={STYLES[i]?.name} loading="lazy" className="aspect-[2/3] w-full object-cover" />
+                <img src={u} alt={STYLES[i]?.name} loading="lazy" className="aspect-[2/3] w-full select-auto object-cover [-webkit-touch-callout:default]" />
                 <div className="flex items-center justify-between gap-2 p-3">
                   <p className="line-clamp-1 text-xs font-semibold text-pine">{STYLES[i]?.name}</p>
-                  <Button size="icon" variant="ghost" aria-label="Download" disabled={!blobs[u]} onClick={() => void deliverFile(blobs[u]!, `${reference}-${i + 1}.png`)}>
+                  <Button size="icon" variant="ghost" aria-label="Download" disabled={!blobs[u] && !needsLongPressSave()} onClick={() => { const name = `${reference}-${i + 1}.png`; if (needsLongPressSave()) setSaveTarget({ src: u, blob: blobs[u], name }); else void deliverFile(blobs[u]!, name); }}>
                     <Download />
                   </Button>
                 </div>

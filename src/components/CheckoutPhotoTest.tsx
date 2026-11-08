@@ -1,5 +1,6 @@
 import { blockIfOffline } from "@/lib/offline";
-import { deliverFile, dataUrlToBlob } from "@/lib/download";
+import { deliverFile, dataUrlToBlob, needsLongPressSave } from "@/lib/download";
+import { SaveImageSheet, type SaveTarget } from "@/components/SaveImageSheet";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, FlaskConical, LoaderCircle } from "lucide-react";
@@ -18,6 +19,7 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [slots, setSlots] = useState<Slot[]>(emptySlots);
+  const [saveTarget, setSaveTarget] = useState<SaveTarget>(null);
   const first = STYLES.findIndex(style => style.key === template);
   // Selected template first, then the remaining styles — same order as paid orders.
   const order = [first < 0 ? 0 : first, ...STYLES.map((_, i) => i).filter(i => i !== (first < 0 ? 0 : first))];
@@ -43,6 +45,8 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
 
   return <>
     <Button type="button" variant="festive" size="lg" className="mt-4 h-16 w-full text-lg font-bold shadow-lg" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical className="size-6" />TEST PHOTO — Try 5 styles</Button>
+    <>
+    <SaveImageSheet target={saveTarget} onClose={() => setSaveTarget(null)} />
     <Dialog open={open} onOpenChange={value => { if (!busy) setOpen(value); }}>
       <DialogContent className="max-h-[90svh] overflow-y-auto">
         <DialogHeader>
@@ -57,14 +61,14 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
               <div key={style.key} className="space-y-1">
                 <p className="text-xs font-semibold text-pine">{style.name}{index === first ? " (selected)" : ""}</p>
                 {slot.image ? (
-                  <img src={slot.image} alt={`${style.name} test photo`} className="w-full rounded-xl object-contain" />
+                  <img src={slot.image} alt={`${style.name} test photo`} className="w-full select-auto rounded-xl object-contain [-webkit-touch-callout:default]" />
                 ) : (
                   <div className="flex h-32 items-center justify-center rounded-xl bg-snow/60 text-xs text-pine/70">
                     {slot.busy ? <LoaderCircle className="animate-spin" /> : slot.error ? <span role="alert" className="break-words p-2 text-destructive">{slot.error}</span> : "Waiting…"}
                   </div>
                 )}
                 {slot.image && (
-                  <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => void deliverFile(dataUrlToBlob(slot.image!), `pasko-test-${style.key}.png`)}>
+                  <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => { const blob = dataUrlToBlob(slot.image!); const name = `pasko-test-${style.key}.png`; if (needsLongPressSave()) setSaveTarget({ src: slot.image!, blob, name }); else void deliverFile(blob, name); }}>
                     <Download />Save photo
                   </Button>
                 )}
@@ -78,5 +82,6 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
         </Button>
       </DialogContent>
     </Dialog>
+    </>
   </>;
 }
