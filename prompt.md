@@ -38,7 +38,7 @@ Customers do not need to sign in. Keep order access private through a secret per
 
 Use the individual pictures from the owner's latest five-scene artwork as template previews. Match each scene in generation instructions. Preserve the existing stored template keys so older orders remain compatible.
 
-Aim to preserve the uploaded subjects' recognizable faces, skin tones, ages, body proportions, natural appearance, and exact number of people. Never add, remove, duplicate, merge, or replace subjects; never copy the illustrative sample family. Adapt each scene to a single person or group with every face clearly visible. Restore faded or scratched originals naturally and produce photorealistic Christmas portraits without captions or watermarks. Do not promise perfect identity preservation or present illustrative samples as actual customer results.
+Use the uploaded image as the sole face reference in every style. Identity preservation takes priority over scene poses and expressions: keep each person's exact facial features, distinctive marks, skin texture, skin tone, age, original expression, gaze, and head angle. Change clothing and Christmas surroundings, not faces; never beautify, substitute, invent a smile, or reconstruct unclear faces as different people. Preserve the exact subject count and never copy the illustrative sample family. Restore damage conservatively without redesigning faces. Do not promise perfect identity preservation or present illustrative samples as actual customer results.
 
 ## Real AI photo generation
 

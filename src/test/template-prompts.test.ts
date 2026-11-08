@@ -33,4 +33,11 @@ describe("Owner's five Christmas scenes", () => {
     expect(IDENTITY_RULE).toContain("Preserve the exact number of subjects");
     expect(IDENTITY_RULE).toContain("never copy the illustrative sample family");
   });
+  it("prioritizes the uploaded exact face over scene poses and expressions", () => {
+    expect(IDENTITY_RULE).toContain("sole face reference for every subject in every style");
+    expect(IDENTITY_RULE).toContain("each person's exact face");
+    expect(IDENTITY_RULE).toContain("overrides any scene instruction requesting a different pose or expression");
+    expect(IDENTITY_RULE).toContain("Keep the original facial expression, gaze, and head angle");
+    expect(IDENTITY_RULE).toContain("Change only clothing, accessories outside the face, and Christmas surroundings");
+  });
 });

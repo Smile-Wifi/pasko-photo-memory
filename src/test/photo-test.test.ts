@@ -3,6 +3,7 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
 vi.mock("@tanstack/react-start", () => ({ createServerFn: () => ({ middleware() { return this; }, inputValidator() { return this; }, handler(fn: unknown) { return fn; } }) }));
 import { testPhoto, testCheckoutPhoto } from "@/lib/api/photo-test.functions";
+import { IDENTITY_RULE } from "@/lib/catalog";
 
 const GATEWAY = "https://ai.gateway.lovable.dev/v1/images/generations";
 const okImage = () => Response.json({ data: [{ b64_json: "AQID" }] });
@@ -43,6 +44,9 @@ describe("checkout tester access", () => {
     for (const call of fetcher.mock.calls) {
       expect(call[0]).toBe(GATEWAY);
       expect(call[1]?.headers?.Authorization).toBe("Bearer test-key");
+      const parts = JSON.parse(call[1]?.body as string).contents[0].parts;
+      expect(parts).toContainEqual({ inlineData: { mimeType: "image/jpeg", data: "AQID" } });
+      expect(parts[0].text).toContain(IDENTITY_RULE);
     }
     expect(promptOf(fetcher, 0)).toContain("Snow winter portrait");
     expect(promptOf(fetcher, 1)).toContain("Simbang Gabi");
