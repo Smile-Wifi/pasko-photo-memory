@@ -19,3 +19,12 @@ export const testCheckoutPhoto = createServerFn({ method: "POST" })
     const { generateTestPhoto } = await import("@/server/photo-test.server");
     return generateTestPhoto(data.photo, data.index);
   });
+// Public: returns a short-lived link to the shared slideshow song (site music, not customer data).
+export const testSlideshowMusic = createServerFn({ method: "GET" }).handler(async () => {
+  const { getSettings, signPaths, MEDIA_BUCKET } = await import("@/server/storage.server");
+  const s = await getSettings();
+  const path = s.music.path;
+  if (!path) return { url: null as string | null, title: null as string | null };
+  const url = (await signPaths(MEDIA_BUCKET, [path], 3600))[path] ?? null;
+  return { url, title: s.music.title };
+});

@@ -207,7 +207,7 @@ function CreatePage() {
               ))}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">You'll see the account details on the next page. We verify your payment before processing.</p>
-            {photo && chosenTemplate && <CheckoutPhotoTest photo={photo.dataUrl} template={chosenTemplate} />}
+            {photo && chosenTemplate && <CheckoutPhotoTest key={pkg} photo={photo.dataUrl} template={chosenTemplate} pkg={pkg} />}
           </section>}
 
           {step > 1 && <Button type="button" variant="ghost" onClick={() => setStep(step - 1)} disabled={submitting}><ArrowLeft />Back</Button>}

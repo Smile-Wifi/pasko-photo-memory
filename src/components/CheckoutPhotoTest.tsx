@@ -1,12 +1,13 @@
 import { blockIfOffline } from "@/lib/offline";
 import { deliverFile, dataUrlToBlob, needsLongPressSave } from "@/lib/download";
 import { SaveImageSheet, type SaveTarget } from "@/components/SaveImageSheet";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, FlaskConical, LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { testCheckoutPhoto } from "@/lib/api/photo-test.functions";
+import { testCheckoutPhoto, testSlideshowMusic } from "@/lib/api/photo-test.functions";
+import { Slideshow } from "@/components/order/Slideshow";
 import { STYLES } from "@/lib/catalog";
 import type { TemplateId } from "@/lib/order-process";
 
@@ -14,8 +15,11 @@ type Slot = { image: string; error: string; busy: boolean };
 
 const emptySlots = (): Slot[] => STYLES.map(() => ({ image: "", error: "", busy: false }));
 
-export function CheckoutPhotoTest({ photo, template }: { photo: string; template: TemplateId }) {
+export function CheckoutPhotoTest({ photo, template, pkg = "basic" }: { photo: string; template: TemplateId; pkg?: "basic" | "premium" }) {
   const run = useServerFn(testCheckoutPhoto);
+  const getMusic = useServerFn(testSlideshowMusic);
+  const [music, setMusic] = useState<{ url: string | null; title: string | null } | null>(null);
+  const premium = pkg === "premium";
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [slots, setSlots] = useState<Slot[]>(emptySlots);
@@ -38,20 +42,27 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
         setSlots(prev => prev.map((slot, i) => (i === index ? { image: "", error: message, busy: false } : slot)));
       }
     }
+    if (premium) setMusic(await getMusic().catch(() => ({ url: null, title: null })));
     setBusy(false);
   }
 
   const done = slots.some(slot => slot.image || slot.error);
+  const finished = slots.filter(slot => slot.image);
+  // Slideshow follows the generation order, selected/first style first.
+  const slideImages = order.map(i => slots[i]?.image).filter((x): x is string => !!x);
+  const slideKey = slideImages.join("|");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const slideBlobs = useMemo(() => Object.fromEntries(slideImages.map(u => [u, dataUrlToBlob(u)])), [slideKey]);
 
   return <>
-    <Button type="button" variant="festive" size="lg" className="mt-4 h-16 w-full text-lg font-bold shadow-lg" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical className="size-6" />TEST PHOTO — Try 5 styles</Button>
+    <Button type="button" variant="festive" size="lg" className="mt-4 h-16 w-full text-lg font-bold shadow-lg" onClick={() => { setOpen(true); setSlots(emptySlots()); }}><FlaskConical className="size-6" />{premium ? "TEST ₱149 — 5 photos + slideshow & music" : "TEST PHOTO — Try 5 styles"}</Button>
     <>
     <SaveImageSheet target={saveTarget} onClose={() => setSaveTarget(null)} />
     <Dialog open={open} onOpenChange={value => { if (!busy) setOpen(value); }}>
       <DialogContent className="max-h-[90svh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Test Christmas Photos</DialogTitle>
-          <DialogDescription>Generates all 5 styles, one at a time, using the app's built-in AI. No payment or customer order is created.</DialogDescription>
+          <DialogTitle>{premium ? "Test ₱149 Magic with Music" : "Test Christmas Photos"}</DialogTitle>
+          <DialogDescription>{premium ? "Creates all 5 styles, then the slideshow with Christmas music and a downloadable video — exactly what ₱149 customers get. No payment or order is created." : "Generates all 5 styles, one at a time, using the app's built-in AI. No payment or customer order is created."}</DialogDescription>
         </DialogHeader>
         {!done && <img src={photo} alt="Your uploaded photo" className="mx-auto max-h-60 w-full object-contain" />}
         <div className="grid grid-cols-2 gap-3">
@@ -76,6 +87,9 @@ export function CheckoutPhotoTest({ photo, template }: { photo: string; template
             );
           })}
         </div>
+        {premium && !busy && finished.length > 0 && music && (
+          <Slideshow images={slideImages} musicUrl={music.url} musicTitle={music.title} blobs={slideBlobs} fileName="pasko-test-slideshow" />
+        )}
         <Button type="button" variant="festive" disabled={busy} onClick={generate}>
           {busy ? <LoaderCircle className="animate-spin" /> : <FlaskConical />}
           {busy ? "Generating…" : done ? "Test again" : "Generate 5 Test Photos"}
