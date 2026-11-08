@@ -2,34 +2,56 @@ import { useEffect, useRef, useState } from "react";
 import { Clapperboard, Download, ExternalLink, Loader2, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { Progress } from "@/components/ui/progress";
-import { recordSlideshow } from "@/lib/slideshow-video";
-import { deliverFile, isInAppBrowser } from "@/lib/download";
+import { recordSlideshow, wakeSlideshowAudio } from "@/lib/slideshow-video";
+import { deliverFile } from "@/lib/download";
 import { Button } from "@/components/ui/button";
 
 export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName = "PaskoPhotoMagic-slideshow", autoStart = false }: { images: string[]; musicUrl: string | null; musicTitle: string | null; blobs?: Record<string, Blob>; fileName?: string; autoStart?: boolean }) {
   const [making, setMaking] = useState<number | null>(null);
   const [video, setVideo] = useState<{ blob: Blob; ext: string; url: string } | null>(null);
+  const [error, setError] = useState("");
+  const recording = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => () => { if (video) URL.revokeObjectURL(video.url); }, [video]);
 
   // Step 1 builds the video; a separate tap saves it (iPhone blocks saves that wait).
   async function makeVideo() {
+    if (recording.current) return;
+    recording.current = true;
     setMaking(0);
+    setError("");
+    setVideo(null);
+    let audioContext: AudioContext | undefined;
     try {
-      const photos = await Promise.all(images.map(async (u) => blobs[u] ?? (await (await fetch(u)).blob())));
-      const music = musicUrl ? await (await fetch(musicUrl)).blob() : null;
-      const r = await recordSlideshow(photos, music, setMaking);
-      setVideo({ ...r, url: URL.createObjectURL(r.blob) });
+      // Resume before fetching so a retry tap retains iPhone's audio permission.
+      if (musicUrl) {
+        audioContext = new AudioContext();
+        await wakeSlideshowAudio(audioContext);
+      }
+      const load = async (url: string) => {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Could not load the photos or music. Refresh the page and try again.");
+        return response.blob();
+      };
+      const photos = await Promise.all(images.map(u => blobs[u] ?? load(u)));
+      const music = musicUrl ? await load(musicUrl) : null;
+      const r = await recordSlideshow(photos, music, p => { if (mounted.current) setMaking(p); }, audioContext);
+      if (mounted.current) setVideo({ ...r, url: URL.createObjectURL(r.blob) });
     } catch (e) {
-      toast.error((e as Error).message || "Could not create the slideshow video.");
+      const message = e instanceof Error ? e.message : "Could not create the slideshow video.";
+      if (mounted.current) { setError(message); toast.error(message); }
     } finally {
-      setMaking(null);
+      if (audioContext && audioContext.state !== "closed") await audioContext.close();
+      recording.current = false;
+      if (mounted.current) setMaking(null);
     }
   }
 
   // ₱149 orders: start building the video as soon as the photos are on the page.
   const autoStarted = useRef(false);
   useEffect(() => {
-    if (!autoStart || autoStarted.current || !images.length) return;
+    if (!autoStart || autoStarted.current || images.length !== 5) return;
     autoStarted.current = true;
     void makeVideo();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -42,7 +64,7 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
 
   useEffect(() => {
     if (!playing) return;
-    const id = setInterval(() => setI((x) => (x + 1) % images.length), 3500);
+    const id = setInterval(() => setI((x) => (x + 1) % images.length), 6000);
     return () => clearInterval(id);
   }, [playing, images.length]);
 
@@ -85,15 +107,18 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
             <p className="mt-1 flex items-center gap-1 text-xs"><Loader2 className="h-3 w-3 animate-spin" /> Creating your slideshow video with music… about 30 seconds. Keep this page open.</p>
           </div>
         ) : video ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-3">
+            <video src={video.url} controls playsInline preload="metadata" aria-label="Slideshow video preview" className="max-h-96 w-full rounded-xl" onError={() => { setError("This browser cannot play the video. Open this page in Safari or Chrome and create it again."); setVideo(null); }} />
+            <div className="flex flex-wrap gap-2">
             <Button variant="gold" onClick={() => void deliverFile(video.blob, `${fileName}.${video.ext}`)}><Download /> Save slideshow video</Button>
-            {isInAppBrowser() && (
-              <Button asChild variant="snow"><a href={video.url} target="_blank" rel="noopener noreferrer"><ExternalLink /> Open video</a></Button>
-            )}
+            <Button asChild variant="snow"><a href={video.url} target="_blank" rel="noopener noreferrer"><ExternalLink /> Open video</a></Button>
+            </div>
+            {video.ext === "webm" && <p className="text-xs text-pine-foreground/80">WebM video · For an iPhone Photos-compatible MP4, open this page in Safari and create the video there.</p>}
           </div>
         ) : (
           <Button variant="snow" className="w-full" onClick={makeVideo}><Clapperboard /> Create slideshow video with music</Button>
         )}
+        {error && <p role="alert" className="text-sm text-pine-foreground">{error}</p>}
       </div>
       {musicUrl && <audio ref={audio} src={musicUrl} loop preload="none" />}
     </div>
