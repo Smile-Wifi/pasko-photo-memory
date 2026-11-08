@@ -59,12 +59,19 @@ function CreatePage() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Partial<Record<"photo" | "fullName" | "mobile" | "email", string>>>({});
   const [submitting, setSubmitting] = useState(false);
+  // ₱149 includes every style, so no choice is needed; ₱99 customers pick which one is made first.
+  const chosenTemplate: TemplateId | null = pkg === "premium" ? (template ?? STYLES[0]!.key) : template;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     if (step >= 3 && blockIfOffline("order")) return;
     if (step < 3) {
-      if (canAdvance(step, Boolean(photo), template)) setStep(step + 1);
+      if (canAdvance(step, Boolean(photo), chosenTemplate)) setStep(step + 1);
+      return;
+    }
+    if (!chosenTemplate) {
+      toast.error("Please choose your first template for the ₱99 package.");
+      setStep(2);
       return;
     }
     const errs: Partial<Record<"photo" | "fullName" | "mobile" | "email", string>> = {};
@@ -74,14 +81,14 @@ function CreatePage() {
     if (!m) errs.mobile = "Enter a valid PH mobile number (e.g. 0917 123 4567).";
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.email = "Enter a valid email or leave it blank.";
     setErrors(errs);
-    if (Object.keys(errs).length || !photo || !m || !template) {
+    if (Object.keys(errs).length || !photo || !m || !chosenTemplate) {
       toast.error(Object.values(errs)[0]);
       return;
     }
     setSubmitting(true);
     try {
       const r = await placeOrder({
-        data: { fullName, mobile: m, email, pkg, template, paymentMethod: method, photo: photo.dataUrl },
+        data: { fullName, mobile: m, email, pkg, template: chosenTemplate, paymentMethod: method, photo: photo.dataUrl },
       });
       try {
         localStorage.setItem("xm-last-order", JSON.stringify(r));
@@ -103,7 +110,7 @@ function CreatePage() {
             <h1 className="text-3xl font-bold text-pine md:text-4xl">Create your Christmas magic 🎄</h1>
             <p className="mt-2 text-muted-foreground">One upload. Five magical Christmas photos!</p>
             <ol className="mt-6 grid grid-cols-4 gap-2 text-center text-xs">
-              {["Upload photo", "Choose template", "Payment", "Generate 5 fotos"].map((label, i) => <li key={label} aria-current={step === i + 1 ? "step" : undefined} className={cn("border-t-4 pt-2", i + 1 <= step ? "border-primary text-primary" : "border-border text-muted-foreground")}>{label}</li>)}
+              {["Upload photo", pkg === "premium" ? "Your 5 styles" : "Choose template", "Payment", "Generate 5 fotos"].map((label, i) => <li key={label} aria-current={step === i + 1 ? "step" : undefined} className={cn("border-t-4 pt-2", i + 1 <= step ? "border-primary text-primary" : "border-border text-muted-foreground")}>{label}</li>)}
             </ol>
           </div>
 
@@ -113,7 +120,20 @@ function CreatePage() {
             <p className="mt-2 text-xs text-muted-foreground">Tip: a clear, front-facing photo gives the best results. Only one photo per order.</p>
           </section>}
 
-          {step === 2 && <section>
+          {step === 2 && pkg === "premium" && <section>
+            <StepHead n={2} title="Your 5 Christmas styles" />
+            <p className="mb-4 text-sm text-muted-foreground">The ₱149 Magic with Music package includes all five styles — no need to choose. We'll create every one from your photo.</p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {STYLES.map(s => <div key={s.key} className="relative overflow-hidden rounded-lg border-2 border-primary/40 bg-card">
+                <img src={site?.samples.find(x => x.style === s.name)?.url ?? s.image ?? undefined} alt={s.name} width={640} height={800} className="aspect-[4/5] w-full object-cover" />
+                <span className="block min-h-14 p-3 text-xs font-semibold">{s.name}</span>
+                <Check className="absolute right-2 top-2 rounded-full bg-primary text-primary-foreground" />
+              </div>)}
+            </div>
+            <Button type="button" variant="link" className="mt-3 h-auto p-0 text-sm" onClick={() => setPkg("basic")}>Prefer ₱99 Basic? Switch and choose your first template</Button>
+          </section>}
+
+          {step === 2 && pkg === "basic" && <section>
             <StepHead n={2} title="Choose your template" />
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {STYLES.map(s => <Button key={s.key} type="button" variant="outline" aria-label={s.name} aria-pressed={template === s.key} onClick={() => setTemplate(s.key)} className={cn("relative h-auto min-w-0 flex-col items-stretch overflow-hidden whitespace-normal rounded-lg border-2 p-0 text-left", template === s.key ? "border-primary ring-2 ring-primary/20" : "border-border")}>
@@ -187,7 +207,7 @@ function CreatePage() {
               ))}
             </div>
             <p className="mt-2 text-xs text-muted-foreground">You'll see the account details on the next page. We verify your payment before processing.</p>
-            {photo && template && <CheckoutPhotoTest photo={photo.dataUrl} template={template} />}
+            {photo && chosenTemplate && <CheckoutPhotoTest photo={photo.dataUrl} template={chosenTemplate} />}
           </section>}
 
           {step > 1 && <Button type="button" variant="ghost" onClick={() => setStep(step - 1)} disabled={submitting}><ArrowLeft />Back</Button>}
@@ -201,7 +221,7 @@ function CreatePage() {
               <div>
                 <p className="font-semibold">{PACKAGES[pkg].name}</p>
                 <p className="text-xs text-pine-foreground/70">5 Christmas photos · {PAYMENT_METHODS[method]}</p>
-                {template && <p className="mt-1 text-xs text-gold">{STYLES.find(s => s.key === template)?.name}</p>}
+                {pkg === "premium" ? <p className="mt-1 text-xs text-gold">All 5 styles included</p> : template && <p className="mt-1 text-xs text-gold">{STYLES.find(s => s.key === template)?.name}</p>}
               </div>
             </div>
             <div className="mt-6 flex items-end justify-between border-t border-snow/15 pt-4">
@@ -214,8 +234,8 @@ function CreatePage() {
                 <p className="mt-2 text-xs text-pine-foreground/80">Uploading your photo securely…</p>
               </div>
             )}
-            <Button type="submit" variant="festive" size="xl" className="mt-6 w-full" disabled={submitting || (step < 3 && !canAdvance(step, Boolean(photo), template))}>
-              {submitting ? "Placing order…" : step === 1 ? "Choose template" : step === 2 ? "Continue to payment" : `Proceed to pay – ${peso(prices[pkg])}`}<ArrowRight />
+            <Button type="submit" variant="festive" size="xl" className="mt-6 w-full" disabled={submitting || (step < 3 && !canAdvance(step, Boolean(photo), chosenTemplate))}>
+              {submitting ? "Placing order…" : step === 1 ? (pkg === "premium" ? "See my 5 styles" : "Choose template") : step === 2 ? "Continue to payment" : `Proceed to pay – ${peso(prices[pkg])}`}<ArrowRight />
             </Button>
             {step === 3 && <p className="mt-4 flex items-start gap-2 text-xs text-pine-foreground/80"><Sparkles className="size-4 shrink-0 text-gold" />4. Generate 5 fotos — our team starts after verifying your payment.</p>}
             <p className="mt-3 flex items-center justify-center gap-1 text-xs text-pine-foreground/70">
