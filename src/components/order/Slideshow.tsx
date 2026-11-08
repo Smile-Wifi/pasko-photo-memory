@@ -47,7 +47,7 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
     <div className="overflow-hidden rounded-3xl bg-festive p-3 shadow-card">
       <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl sm:aspect-[4/5]">
         {images.map((src, idx) => (
-          <img key={src} src={src} alt={`Christmas photo ${idx + 1}`} className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ${idx === i ? "opacity-100" : "opacity-0"}`} />
+          <img key={src} src={src} alt={`Christmas photo ${idx + 1}`} className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out ${idx === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`} />
         ))}
         <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1.5 p-3">
           {images.map((_, idx) => (

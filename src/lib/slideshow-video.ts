@@ -61,7 +61,22 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
     ctx.fillRect(0, 0, W, H);
     drawCover(ctx, bitmaps[idx]!, 1, 1 + 0.06 * (local / PER_PHOTO));
     const next = bitmaps[idx + 1];
-    if (next && local > PER_PHOTO - FADE) drawCover(ctx, next, (local - (PER_PHOTO - FADE)) / FADE, 1);
+    if (next && local > PER_PHOTO - FADE) {
+      const p = (local - (PER_PHOTO - FADE)) / FADE;
+      drawCover(ctx, next, p, 1.12 - 0.12 * p); // cheerful pop-in
+    }
+    // Twinkling gold sparkles for a festive, magical feel.
+    for (let s = 0; s < 28; s++) {
+      const x = ((s * 97.3) % W);
+      const y = (((s * 53.7) + t * 60 * (1 + (s % 3))) % H);
+      const a = 0.35 + 0.35 * Math.sin(t * 4 + s);
+      ctx.globalAlpha = Math.max(0, a);
+      ctx.fillStyle = s % 2 ? "#f5c542" : "#ffffff";
+      ctx.beginPath();
+      ctx.arc(x, y, 2 + (s % 3), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
   };
 
   draw(0);
