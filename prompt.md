@@ -32,7 +32,7 @@ Customers do not need to sign in. Keep order access private through a secret per
 
 1. **Simbang Gabi:** Outside a historic Filipino stone church at dusk, with a cobblestone path, glowing parol stars and handheld lanterns. Casual, modest mass-outing clothes — plain collared shirts and neat trousers for men and boys, simple casual dresses or blouses with skirts for women and girls; no barong Tagalog, no Filipiniana gowns; warm church lighting.
 2. **Snow:** Snow-covered pine forest, gently falling snow, ivory winter coats, knitted scarves and hats, mugs of hot chocolate, and soft daylight.
-3. **Pajama:** Matching red-and-green tartan pajamas on a cozy sofa, Christmas tree, gifts, stockings, hot chocolate, popcorn, and warm fairy lights.
+3. **Pajama:** Matching red-and-green tartan pajamas on a cozy sofa, every person wearing a red Santa hat with white fur trim and a white pom-pom, plus a Christmas tree, gifts, stockings, hot chocolate, popcorn, and warm fairy lights.
 4. **Street Celebration:** A lively Filipino Christmas street at night beneath colorful parol lanterns, food stalls and softly blurred crowds. Black shirts with red floral patterns and coordinated red holiday outfits.
 5. **Traditional / Spanish / Barong:** A Spanish-colonial Filipino home with carved wood, capiz windows, chandelier, parol lanterns and Christmas tree. Cream embroidered barong and deep burgundy Filipiniana gowns with gold embroidery.
 

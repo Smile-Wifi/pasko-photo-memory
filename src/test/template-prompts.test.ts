@@ -18,6 +18,11 @@ describe("Owner's five Christmas scenes", () => {
   it("uses matching tartan pajamas on a sofa for the stored family style", () => {
     expect(STYLES.find(s => s.key === "family")?.prompt).toMatch(/Pajama portrait.*tartan pajamas.*sofa/);
   });
+  it("puts a red Santa hat on every subject in the Pajama style", () => {
+    const prompt = STYLES.find(s => s.key === "family")?.prompt ?? "";
+    expect(prompt).toContain("red Santa hat");
+    expect(prompt).toContain("every person's head");
+  });
   it("uses a parol-filled street celebration for the stored lights style", () => {
     expect(STYLES.find(s => s.key === "lights")?.prompt).toMatch(/Street Celebration.*colorful glowing parol/);
   });

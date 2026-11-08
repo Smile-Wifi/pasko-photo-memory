@@ -1,6 +1,6 @@
 import original from "@/assets/style-original.jpg";
 import santa from "@/assets/template-simbang-casual.jpg";
-import family from "@/assets/template-pajama.jpg.asset.json";
+import family from "@/assets/template-pajama-santa-cap-45.jpg";
 import winter from "@/assets/template-snow.jpg.asset.json";
 import lights from "@/assets/template-street.jpg.asset.json";
 import fashion from "@/assets/template-traditional.jpg.asset.json";
@@ -23,9 +23,9 @@ export const STYLES = [
   {
     key: "family",
     name: "Pajama",
-    image: family.url,
+    image: family,
     prompt:
-      "Transform the uploaded subjects into a photorealistic cozy Christmas Pajama portrait. Dress everyone in matching red-and-green tartan pajamas, seated comfortably together on a sofa in a warm living room. Include a decorated Christmas tree, wrapped gifts, stockings, soft golden fairy lights, mugs of hot chocolate and a bowl of popcorn. Create a relaxed, joyful holiday moment with natural expressions and warm indoor lighting. No formal barong, outdoor snow, captions, or watermarks.",
+      "Transform the uploaded subjects into a photorealistic cozy Christmas Pajama portrait. Dress everyone in matching red-and-green tartan pajamas, and put a classic red Santa hat with a fluffy white fur trim and white pom-pom on every person's head. Seat them comfortably together on a sofa in a warm living room. Include a decorated Christmas tree, wrapped gifts, stockings, soft golden fairy lights, mugs of hot chocolate and a bowl of popcorn. Create a relaxed, joyful holiday moment with natural expressions and warm indoor lighting. No formal barong, outdoor snow, captions, or watermarks.",
   },
   {
     key: "winter",
