@@ -10,23 +10,31 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
   const [making, setMaking] = useState<number | null>(null);
   const [video, setVideo] = useState<{ blob: Blob; ext: string; url: string } | null>(null);
   const [error, setError] = useState("");
+  const [needsTap, setNeedsTap] = useState(false);
   const recording = useRef(false);
   const mounted = useRef(true);
   useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
   useEffect(() => () => { if (video) URL.revokeObjectURL(video.url); }, [video]);
 
   // Step 1 builds the video; a separate tap saves it (iPhone blocks saves that wait).
-  async function makeVideo() {
+  async function makeVideo(automatic = false) {
     if (recording.current) return;
     recording.current = true;
     setMaking(0);
     setError("");
+    setNeedsTap(false);
     setVideo(null);
     let audioContext: AudioContext | undefined;
     try {
       // Resume before fetching so a retry tap retains iPhone's audio permission.
       if (musicUrl) {
         audioContext = new AudioContext();
+        // Autoplay restrictions are normal in iPhone/in-app browsers and editor frames.
+        // Do not turn a blocked automatic attempt into a failed customer video.
+        if (automatic && audioContext.state !== "running") {
+          setNeedsTap(true);
+          return;
+        }
         await wakeSlideshowAudio(audioContext);
       }
       const load = async (url: string) => {
@@ -42,7 +50,7 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
       const message = e instanceof Error ? e.message : "Could not create the slideshow video.";
       if (mounted.current) { setError(message); toast.error(message); }
     } finally {
-      if (audioContext && audioContext.state !== "closed") await audioContext.close();
+      if (audioContext && audioContext.state !== "closed") await audioContext.close().catch(() => {});
       recording.current = false;
       if (mounted.current) setMaking(null);
     }
@@ -53,7 +61,7 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
   useEffect(() => {
     if (!autoStart || autoStarted.current || images.length !== 5) return;
     autoStarted.current = true;
-    void makeVideo();
+    void makeVideo(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoStart, images.length]);
 
@@ -116,8 +124,9 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
             {video.ext === "webm" && <p className="text-xs text-pine-foreground/80">WebM video · For an iPhone Photos-compatible MP4, open this page in Safari and create the video there.</p>}
           </div>
         ) : (
-          <Button variant="snow" className="w-full" onClick={makeVideo}><Clapperboard /> Create slideshow video with music</Button>
+          <Button variant="snow" className="w-full" onClick={() => void makeVideo()}><Clapperboard /> {needsTap ? "Tap to create slideshow with music" : "Create slideshow video with music"}</Button>
         )}
+        {needsTap && <p className="text-sm text-pine-foreground">Your browser needs one tap to enable music. / I-tap para paganahin ang music.</p>}
         {error && <p role="alert" className="text-sm text-pine-foreground">{error}</p>}
       </div>
       {musicUrl && <audio ref={audio} src={musicUrl} loop preload="none" />}

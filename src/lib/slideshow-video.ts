@@ -104,7 +104,10 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
       recorder.onstop = () => resolve();
       recorder.onerror = () => reject(new Error("Video recording failed. Please try again in Safari or Chrome."));
       const visibility = () => {
-        if (document.hidden) reject(new Error("Recording was interrupted. Keep this page open and tap Create slideshow video again."));
+        if (!document.hidden) return;
+        document.removeEventListener("visibilitychange", visibility);
+        reject(new Error("Recording was interrupted. Keep this page open and tap Create slideshow video again."));
+        if (recorder.state !== "inactive") recorder.stop();
       };
       document.addEventListener("visibilitychange", visibility);
       const stop = recorder.onstop;
@@ -131,9 +134,9 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
   } finally {
     cancelAnimationFrame(frame);
     if (rec && rec.state !== "inactive") rec.stop();
-    source?.stop();
+    try { source?.stop(); } catch { /* A source can fail before it has started. */ }
     stream?.getTracks().forEach(t => t.stop());
-    if (audioCtx && audioCtx.state !== "closed") await audioCtx.close();
+    if (audioCtx && audioCtx.state !== "closed") await audioCtx.close().catch(() => {});
     bitmaps.forEach(b => b.close());
   }
 }
