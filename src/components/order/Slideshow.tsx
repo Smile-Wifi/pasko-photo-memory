@@ -6,7 +6,7 @@ import { recordSlideshow } from "@/lib/slideshow-video";
 import { deliverFile, isInAppBrowser } from "@/lib/download";
 import { Button } from "@/components/ui/button";
 
-export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName = "PaskoPhotoMagic-slideshow" }: { images: string[]; musicUrl: string | null; musicTitle: string | null; blobs?: Record<string, Blob>; fileName?: string }) {
+export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName = "PaskoPhotoMagic-slideshow", autoStart = false }: { images: string[]; musicUrl: string | null; musicTitle: string | null; blobs?: Record<string, Blob>; fileName?: string; autoStart?: boolean }) {
   const [making, setMaking] = useState<number | null>(null);
   const [video, setVideo] = useState<{ blob: Blob; ext: string; url: string } | null>(null);
   useEffect(() => () => { if (video) URL.revokeObjectURL(video.url); }, [video]);
@@ -25,6 +25,15 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
       setMaking(null);
     }
   }
+
+  // ₱149 orders: start building the video as soon as the photos are on the page.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStarted.current || !images.length) return;
+    autoStarted.current = true;
+    void makeVideo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, images.length]);
 
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);

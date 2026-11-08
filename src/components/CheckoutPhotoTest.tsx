@@ -88,7 +88,7 @@ export function CheckoutPhotoTest({ photo, template, pkg = "basic" }: { photo: s
           })}
         </div>
         {premium && !busy && finished.length > 0 && music && (
-          <Slideshow images={slideImages} musicUrl={music.url} musicTitle={music.title} blobs={slideBlobs} fileName="pasko-test-slideshow" />
+          <Slideshow images={slideImages} musicUrl={music.url} musicTitle={music.title} blobs={slideBlobs} fileName="pasko-test-slideshow" autoStart />
         )}
         <Button type="button" variant="festive" disabled={busy} onClick={generate}>
           {busy ? <LoaderCircle className="animate-spin" /> : <FlaskConical />}

@@ -36,6 +36,8 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
   let source: AudioBufferSourceNode | null = null;
   if (music) {
     audioCtx = new AudioContext();
+    // Auto-started videos have no fresh tap; wake the audio engine so the music is recorded.
+    await audioCtx.resume().catch(() => {});
     const buf = await audioCtx.decodeAudioData(await music.arrayBuffer());
     const dest = audioCtx.createMediaStreamDestination();
     const gain = audioCtx.createGain();
