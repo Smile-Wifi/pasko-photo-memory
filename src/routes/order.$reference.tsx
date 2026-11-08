@@ -223,7 +223,7 @@ function OrderPage() {
             </Button>
           </div>
 
-          {order.pkg === "premium" && <Slideshow images={order.results} musicUrl={order.musicUrl} musicTitle={order.musicTitle} />}
+          {order.pkg === "premium" && <Slideshow images={order.results} musicUrl={order.musicUrl} musicTitle={order.musicTitle} blobs={blobs} fileName={`${reference}-slideshow`} />}
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {order.results.map((u, i) => (

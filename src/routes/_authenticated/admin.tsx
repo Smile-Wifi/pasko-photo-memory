@@ -251,7 +251,7 @@ function OrderDetail({ order, onChanged, onClose }: { order: AdminOrder; onChang
             {(Object.keys(STATUS_LABEL) as OrderStatus[]).map((s) => <SelectItem key={s} value={s}>{STATUS_LABEL[s]}</SelectItem>)}
           </SelectContent>
         </Select>
-        {status === "pending_payment" && <Button size="sm" onClick={() => change("payment_verified")}><CheckCircle2 /> Mark payment verified</Button>}
+        {status === "pending_payment" && <Button size="sm" onClick={async () => { await change("payment_verified"); await generateAll(true); }}><CheckCircle2 /> Verify payment &amp; generate 5 photos</Button>}
         <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Customer link copied"); }}>Copy customer link</Button>
       </div>
 
