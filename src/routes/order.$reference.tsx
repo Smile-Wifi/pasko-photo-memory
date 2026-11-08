@@ -31,9 +31,10 @@ const STEPS: OrderStatus[] = ["pending_payment", "payment_verified", "processing
 async function fetchBlob(url: string) {
   const r = await fetch(url);
   if (!r.ok) throw new Error("Download failed");
-  return r.blob();
+  const b = await r.blob();
+  // Storage may label photos generically; iPhone needs the real image type to save to Photos.
+  return b.type.startsWith("image/") ? b : new Blob([b], { type: "image/png" });
 }
-const saveBlob = downloadBlob;
 
 function OrderPage() {
   const { reference } = Route.useParams();
@@ -48,6 +49,7 @@ function OrderPage() {
   const [payRef, setPayRef] = useState("");
   const [sending, setSending] = useState(false);
   const [zipping, setZipping] = useState(false);
+  const [zipBlob, setZipBlob] = useState<Blob | null>(null);
   // Preload photos so a tap can save instantly — iPhone blocks saves that wait on the network.
   const [blobs, setBlobs] = useState<Record<string, Blob>>({});
   const resultKey = order?.results?.join("|") ?? "";
@@ -85,17 +87,29 @@ function OrderPage() {
     }
   }
 
-  async function downloadAll() {
+  // Step 1: build the ZIP. Step 2: a separate tap saves it — iPhone blocks saves that wait.
+  async function prepareZip() {
     setZipping(true);
     try {
       const { default: JSZip } = await import("jszip");
       const zip = new JSZip();
       await Promise.all(order!.results.map(async (u, i) => zip.file(`${reference}-${i + 1}-${STYLES[i]?.key ?? "xmas"}.png`, blobs[u] ?? (await fetchBlob(u)))));
-      saveBlob(await zip.generateAsync({ type: "blob" }), `${reference}-PaskoPhotoMagic.zip`);
+      setZipBlob(await zip.generateAsync({ type: "blob", compression: "STORE" }));
     } catch {
       toast.error("Could not create ZIP. Please download photos one by one.");
     } finally {
       setZipping(false);
+    }
+  }
+
+  const allReady = order.results.length > 0 && order.results.every((u) => blobs[u]);
+  function saveAllToPhotos() {
+    const files = order!.results.map((u, i) => new File([blobs[u]!], `${reference}-${i + 1}.png`, { type: "image/png" }));
+    const touch = matchMedia("(pointer: coarse)").matches;
+    if (touch && navigator.canShare?.({ files })) {
+      navigator.share({ files, title: "My Pasko Photo Magic photos" }).catch(() => {});
+    } else {
+      files.forEach((f, i) => setTimeout(() => downloadBlob(f, f.name), i * 400));
     }
   }
 
@@ -185,7 +199,12 @@ function OrderPage() {
       {order.status === "completed" && (
         <div className="mt-6 space-y-6">
           <div className="flex flex-wrap gap-2">
-            <Button variant="festive" size="lg" onClick={downloadAll} disabled={zipping}><FileArchive /> {zipping ? "Preparing ZIP…" : "Download all (ZIP)"}</Button>
+            <Button variant="festive" size="lg" onClick={saveAllToPhotos} disabled={!allReady}><Download /> {allReady ? "Save all 5 photos" : "Loading photos…"}</Button>
+            {zipBlob ? (
+              <Button variant="outline" size="lg" className="rounded-full" onClick={() => downloadBlob(zipBlob, `${reference}-PaskoPhotoMagic.zip`)}><FileArchive /> Save ZIP file</Button>
+            ) : (
+              <Button variant="outline" size="lg" className="rounded-full" onClick={prepareZip} disabled={zipping}><FileArchive /> {zipping ? "Preparing ZIP…" : "Prepare ZIP"}</Button>
+            )}
             <Button variant="outline" size="lg" className="rounded-full" onClick={shareNative}><Share2 /> Share photo</Button>
             <Button asChild variant="outline" size="lg" className="rounded-full">
               <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(site)}`} target="_blank" rel="noreferrer"><Facebook /> Facebook</a>
