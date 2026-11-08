@@ -16,6 +16,7 @@ import { LangProvider } from "@/lib/i18n";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { Toaster } from "@/components/ui/sonner";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
@@ -74,7 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "theme-color", content: "#16402b" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { name: "apple-mobile-web-app-title", content: "Pasko Photo" },
+      { name: "apple-mobile-web-app-title", content: "Pasko Magic" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { title: "Pasko Photo Magic – Balik Alaala sa Pasko" },
       { name: "description", content: "Turn one photo into five magical AI Christmas photos. ₱99 or ₱149 via GCash, Maya or bank transfer." },
@@ -133,6 +134,7 @@ function RootComponent() {
           </main>
           <SiteFooter />
         </div>
+        <InstallPrompt />
         <Toaster position="top-center" richColors />
       </LangProvider>
     </QueryClientProvider>
