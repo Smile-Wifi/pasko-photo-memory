@@ -7,12 +7,23 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Inside the Lovable sandbox the client build lands in dist/client; with the
+// Vercel preset nitro writes client assets straight into .vercel/output/static.
+// The service worker must be generated into whichever directory is served.
+const isLovableSandbox =
+  process.env["LOVABLE_SANDBOX"] === "1" || !!process.env["DEV_SERVER__PROJECT_PATH"];
+const clientOutDir = isLovableSandbox ? "dist/client" : ".vercel/output/static";
+
 export default defineConfig({
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  // Outside the Lovable sandbox (e.g. Vercel CI), build with nitro's Vercel
+  // preset so the output lands in .vercel/output (Build Output API).
+  // Inside the Lovable sandbox this is overridden to cloudflare-module.
+  nitro: { preset: "vercel" },
   vite: {
     plugins: [
       VitePWA({
@@ -22,7 +33,7 @@ export default defineConfig({
         manifest: false, // public/manifest.webmanifest is used
         devOptions: { enabled: false },
         filename: "sw.js",
-        outDir: "dist/client",
+        outDir: clientOutDir,
         workbox: {
           // Only the app's own built design files; photos and API data are never stored.
           globPatterns: ["**/*.{js,css,png,svg,ico,webp,jpg,woff2}"],

@@ -79,3 +79,19 @@ bun install
 bun run dev      # dev server
 bunx vitest run  # 35 checks
 ```
+
+## Deploying to Vercel
+
+The repo is Vercel-ready: `vite.config.ts` builds with nitro's `vercel` preset outside the Lovable sandbox, producing `.vercel/output` (Build Output API) — static assets + service worker in `static/`, SSR and server functions in `functions/__server.func`. `vercel.json` pins the build command.
+
+1. Import the repo in Vercel (Framework Preset: **Other**; build `npm run build`, install `npm install` — already set in `vercel.json`).
+2. Add these environment variables in the Vercel project settings:
+   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` (browser)
+   - `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (server-only)
+   - `LOVABLE_API_KEY` (test-photo AI gateway)
+3. Deploy. The PWA service worker, manifest, and icons are included in the static output.
+
+Notes:
+- Builds inside Lovable keep the Cloudflare target automatically; the Vercel preset only applies to external CI.
+- Paid-order generation calls Replicate through Lovable's connector gateway — verify that path works from Vercel before relying on it there, or move the Replicate key into a Vercel secret.
+- The daily cleanup job (`/api/public/jobs/cleanup`) needs a cron trigger; on Vercel add a Cron Job pointing at it with the cron secret header.
