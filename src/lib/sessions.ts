@@ -1,10 +1,3 @@
-export const SESSION_PACKAGES = {
-  mini: { name: "Mini Session", price: 1499 },
-  family: { name: "Family Session", price: 2999 },
-  barkada: { name: "Barkada Session", price: 1999 },
-} as const;
-export type SessionPackageId = keyof typeof SESSION_PACKAGES;
-
 export const BANK_DETAILS = {
   bankName: "[ELON LAB CORPORATION BANK NAME]",
   accountName: "ELON LAB CORPORATION",

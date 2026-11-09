@@ -7,14 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { BANK_DETAILS, GCASH_DETAILS, SESSION_PACKAGES, type SessionPackageId } from "@/lib/sessions";
+import { BANK_DETAILS, GCASH_DETAILS } from "@/lib/sessions";
+import { useQuery } from "@tanstack/react-query";
+import { siteDataQuery } from "@/lib/queries";
+import { DEFAULT_PRICES, PACKAGES, peso, type PackageId } from "@/lib/catalog";
 import { submitManualPayment } from "@/lib/api/payments.functions";
 
 export const Route = createFileRoute("/manual-payment")({
   head: () => ({
     meta: [
       { title: "Studio Payment – Pasko Photo Magic Studio" },
-      { name: "description", content: "Pay for a Mini, Family or Barkada session by bank transfer or GCash QR and upload your proof of payment." },
+      { name: "description", content: "Pay for the ₱99 Basic or ₱149 Magic with Music package by bank transfer or GCash QR and upload your proof of payment." },
       { property: "og:title", content: "Studio Payment – Pasko Photo Magic Studio" },
       { property: "og:description", content: "Manual bank transfer or GCash QR payment for studio sessions." },
       { property: "og:type", content: "website" },
@@ -24,15 +27,16 @@ export const Route = createFileRoute("/manual-payment")({
   component: ManualPaymentPage,
 });
 
-const peso = (n: number) => `PHP ${n.toLocaleString("en-PH")}`;
 
 function Field({ id, label, children }: { id: string; label: string; children: React.ReactNode }) {
   return <div><Label htmlFor={id}>{label}</Label><div className="mt-1">{children}</div></div>;
 }
 
 function ManualPaymentPage() {
+  const { data: site } = useQuery(siteDataQuery);
+  const prices = site?.pricing ?? DEFAULT_PRICES;
   const submit = useServerFn(submitManualPayment);
-  const [pkg, setPkg] = useState<SessionPackageId | null>(null);
+  const [pkg, setPkg] = useState<PackageId | null>(null);
   const [method, setMethod] = useState<"bank" | "gcash_qr" | null>(null);
   const [f, setF] = useState({ name: "", phone: "", email: "", ref: "", amount: "", sender: "" });
   const [proof, setProof] = useState<string | null>(null);
@@ -88,12 +92,12 @@ function ManualPaymentPage() {
 
         <section>
           <h2 className="mb-3 text-xl font-bold text-pine">1. Choose a package</h2>
-          <div className="grid gap-3 sm:grid-cols-3">
-            {(Object.keys(SESSION_PACKAGES) as SessionPackageId[]).map(id => (
+          <div className="grid gap-3 sm:grid-cols-2">
+            {(["basic", "premium"] as PackageId[]).map(id => (
               <Button key={id} type="button" variant="outline" aria-pressed={pkg === id} onClick={() => setPkg(id)}
                 className={cn("h-auto flex-col items-start rounded-lg border-2 bg-card p-4 text-left", pkg === id ? "border-gold shadow-card" : "border-border")}>
-                <span className="font-semibold text-pine">{SESSION_PACKAGES[id].name}</span>
-                <span className="font-display text-2xl font-bold text-primary">{peso(SESSION_PACKAGES[id].price)}</span>
+                <span className="font-semibold text-pine">{PACKAGES[id].name}</span>
+                <span className="font-display text-2xl font-bold text-primary">{peso(prices[id])}</span>
               </Button>
             ))}
           </div>
@@ -125,7 +129,7 @@ function ManualPaymentPage() {
               <p><span className="text-gold">GCash Number: </span>{GCASH_DETAILS.number}</p>
               <p className="pt-2 text-xs">Note: Send the exact amount. Save your reference number.</p>
             </div>}
-            <p className="mt-3 font-display text-2xl font-bold text-gold">Amount: {peso(SESSION_PACKAGES[pkg].price)}</p>
+            <p className="mt-3 font-display text-2xl font-bold text-gold">Amount: {peso(prices[pkg])}</p>
           </div>}
         </section>}
 
