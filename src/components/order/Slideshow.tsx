@@ -85,7 +85,7 @@ function SlideshowPlayer({ images, musicUrl, musicTitle, blobs = {}, fileName = 
 
   useEffect(() => {
     if (!playing || !images.length) return;
-    const id = setInterval(() => setI((x) => (x + 1) % images.length), 6000);
+    const id = setInterval(() => setI((x) => (x + 1) % images.length), 3000);
     return () => clearInterval(id);
   }, [playing, images.length]);
 

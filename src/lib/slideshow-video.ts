@@ -1,7 +1,7 @@
 // Records Christmas photos and music locally; never uploads customer media.
 const W = 720;
 const H = 1080;
-const PER_PHOTO = 6;
+const PER_PHOTO = 3;
 const FADE = 1;
 
 const VIDEO_TYPES = ["video/mp4;codecs=avc1,mp4a.40.2", "video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus"];
