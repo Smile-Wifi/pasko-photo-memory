@@ -29,6 +29,13 @@
       "when": 1794204024997,
       "tag": "0003_create_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794204183281,
+      "tag": "0004_payments_without_booking",
+      "breakpoints": true
     }
   ]
 }

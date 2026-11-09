@@ -101,8 +101,8 @@ export type Database = {
       payments: {
         Row: {
           amount: number
-          booking_date: string
-          booking_time: string
+          booking_date: string | null
+          booking_time: string | null
           created_at: string
           customer_name: string
           email: string
@@ -118,8 +118,8 @@ export type Database = {
         }
         Insert: {
           amount: number
-          booking_date: string
-          booking_time: string
+          booking_date?: string | null
+          booking_time?: string | null
           created_at?: string
           customer_name: string
           email: string
@@ -135,8 +135,8 @@ export type Database = {
         }
         Update: {
           amount?: number
-          booking_date?: string
-          booking_time?: string
+          booking_date?: string | null
+          booking_time?: string | null
           created_at?: string
           customer_name?: string
           email?: string

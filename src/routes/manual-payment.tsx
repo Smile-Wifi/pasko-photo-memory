@@ -13,9 +13,9 @@ import { submitManualPayment } from "@/lib/api/payments.functions";
 export const Route = createFileRoute("/manual-payment")({
   head: () => ({
     meta: [
-      { title: "Book a Session – Pasko Photo Magic Studio" },
-      { name: "description", content: "Book a Mini, Family or Barkada photo session and pay by bank transfer or GCash QR. We verify within 1 hour." },
-      { property: "og:title", content: "Book a Session – Pasko Photo Magic Studio" },
+      { title: "Studio Payment – Pasko Photo Magic Studio" },
+      { name: "description", content: "Pay for a Mini, Family or Barkada session by bank transfer or GCash QR and upload your proof of payment." },
+      { property: "og:title", content: "Studio Payment – Pasko Photo Magic Studio" },
       { property: "og:description", content: "Manual bank transfer or GCash QR payment for studio sessions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -34,12 +34,12 @@ function ManualPaymentPage() {
   const submit = useServerFn(submitManualPayment);
   const [pkg, setPkg] = useState<SessionPackageId | null>(null);
   const [method, setMethod] = useState<"bank" | "gcash_qr" | null>(null);
-  const [f, setF] = useState({ name: "", phone: "", email: "", date: "", time: "", persons: "", ref: "", amount: "", sender: "" });
+  const [f, setF] = useState({ name: "", phone: "", email: "", ref: "", amount: "", sender: "" });
   const [proof, setProof] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
-  const detailsOk = f.name.trim().length >= 2 && f.phone.trim().length >= 7 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email) && f.date && f.time;
+  const detailsOk = f.name.trim().length >= 2 && f.phone.trim().length >= 7 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email);
 
   function onProof(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -60,8 +60,7 @@ function ManualPaymentPage() {
     setBusy(true);
     try {
       await submit({ data: {
-        packageId: pkg, customerName: f.name, phone: f.phone, email: f.email, bookingDate: f.date, bookingTime: f.time,
-        persons: f.persons ? Number(f.persons) : null, paymentMethod: method, referenceNumber: f.ref,
+        packageId: pkg, customerName: f.name, phone: f.phone, email: f.email, paymentMethod: method, referenceNumber: f.ref,
         amount: Number(f.amount), senderName: f.sender, proof,
       } });
       setDone(true);
@@ -76,15 +75,14 @@ function ManualPaymentPage() {
       <CheckCircle2 className="mx-auto h-16 w-16 text-gold" />
       <h1 className="mt-4 text-3xl font-bold text-pine">Payment Submitted for Verification</h1>
       <p className="mt-3 inline-block rounded-full bg-gold-gradient px-4 py-1 text-sm font-bold text-gold-foreground">Status: PENDING</p>
-      <p className="mt-4 text-muted-foreground">We will confirm your booking within 1 hour during business hours.</p>
-    </div>
+          </div>
   );
 
   return (
     <div className="bg-secondary/40">
       <form onSubmit={onSubmit} className="mx-auto max-w-2xl space-y-8 px-4 py-10">
         <div>
-          <h1 className="text-3xl font-bold text-pine">Book your studio session</h1>
+          <h1 className="text-3xl font-bold text-pine">Studio session payment</h1>
           <p className="mt-1 text-sm text-muted-foreground">Pasko Photo Magic Studio · a brand of ELON LAB CORPORATION</p>
         </div>
 
@@ -102,15 +100,10 @@ function ManualPaymentPage() {
         </section>
 
         {pkg && <section className="space-y-4 rounded-3xl border border-border bg-card p-5">
-          <h2 className="text-xl font-bold text-pine">2. Booking details</h2>
+          <h2 className="text-xl font-bold text-pine">2. Your details</h2>
           <Field id="name" label="Full Name *"><Input id="name" required value={f.name} onChange={set("name")} className="h-12" /></Field>
           <Field id="phone" label="Phone Number *"><Input id="phone" required inputMode="tel" value={f.phone} onChange={set("phone")} className="h-12" /></Field>
           <Field id="email" label="Email *"><Input id="email" required type="email" value={f.email} onChange={set("email")} className="h-12" /></Field>
-          <div className="grid grid-cols-2 gap-3">
-            <Field id="date" label="Preferred Shoot Date *"><Input id="date" required type="date" value={f.date} onChange={set("date")} className="h-12" /></Field>
-            <Field id="time" label="Preferred Time *"><Input id="time" required type="time" value={f.time} onChange={set("time")} className="h-12" /></Field>
-          </div>
-          <Field id="persons" label="Number of Persons"><Input id="persons" type="number" min={1} max={50} value={f.persons} onChange={set("persons")} className="h-12" /></Field>
         </section>}
 
         {pkg && detailsOk && <section>
