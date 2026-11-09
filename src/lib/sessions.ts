@@ -1,10 +1,12 @@
+import qr from "@/assets/gcash-qr.jpg.asset.json";
+
 export const BANK_DETAILS = {
-  bankName: "[ELON LAB CORPORATION BANK NAME]",
+  bankName: "UnionBank (UB Shaw Blvd Branch) · Business Checking Peso Account",
   accountName: "ELON LAB CORPORATION",
-  accountNumber: "[ELON LAB CORPORATION ACCOUNT NUMBER]",
+  accountNumber: "002160723820",
 };
 export const GCASH_DETAILS = {
   accountName: "ELON LAB CORPORATION",
-  number: "[ELON LAB GCASH NUMBER]",
-  qrUrl: null as string | null, // set once the GCash QR image is uploaded
+  number: "0975 276 5499",
+  qrUrl: qr.url as string | null,
 };
