@@ -1,6 +1,7 @@
 // Records Christmas photos and music locally; never uploads customer media.
 const W = 720;
-const H = 1080;
+const H = 1280;
+const MAIN_H = Math.round(H * 0.75);
 const PER_PHOTO = 3;
 const FADE = 1;
 
@@ -43,13 +44,123 @@ export async function wakeSlideshowAudio(ctx: AudioContext) {
   }
 }
 
-function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, alpha: number, zoom: number) {
-  const scale = Math.max(W / img.width, H / img.height) * zoom;
-  const w = img.width * scale;
-  const h = img.height * scale;
+function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, alpha: number, zoom: number, x = 0, y = 0, w = W, h = H) {
+  const scale = Math.max(w / img.width, h / img.height) * zoom;
+  const dw = img.width * scale;
+  const dh = img.height * scale;
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
   ctx.globalAlpha = alpha;
-  ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-  ctx.globalAlpha = 1;
+  ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+  ctx.restore();
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function makeGrain(): HTMLCanvasElement {
+  const g = document.createElement("canvas");
+  g.width = 256; g.height = 256;
+  const gctx = g.getContext("2d");
+  if (gctx) {
+    const data = gctx.createImageData(256, 256);
+    for (let i = 0; i < data.data.length; i += 4) {
+      const v = Math.random() * 255;
+      data.data[i] = data.data[i + 1] = data.data[i + 2] = v;
+      data.data[i + 3] = 22;
+    }
+    gctx.putImageData(data, 0, 0);
+  }
+  return g;
+}
+
+// Vintage film-strip layout: main photo (top 75%), scrolling strip (bottom 25%), fixed greeting.
+export function drawFilmFrame(ctx: CanvasRenderingContext2D, bitmaps: ImageBitmap[], t: number, grain: HTMLCanvasElement) {
+  const idx = Math.min(Math.floor(t / PER_PHOTO), bitmaps.length - 1);
+  const local = t - idx * PER_PHOTO;
+  ctx.filter = "sepia(0.55) saturate(0.85) contrast(0.9) brightness(1.03)";
+  ctx.fillStyle = "#2a1f16";
+  ctx.fillRect(0, 0, W, H);
+  const current = bitmaps[idx];
+  if (current) drawCover(ctx, current, 1, 1 + 0.08 * (local / PER_PHOTO), 0, 0, W, MAIN_H);
+  const next = bitmaps[idx + 1];
+  if (next && local > PER_PHOTO - FADE) drawCover(ctx, next, (local - (PER_PHOTO - FADE)) / FADE, 1, 0, 0, W, MAIN_H);
+
+  // Film strip
+  const stripY = MAIN_H;
+  const stripH = H - MAIN_H;
+  ctx.fillStyle = "#14100c";
+  ctx.fillRect(0, stripY, W, stripH);
+  ctx.fillStyle = "#e8dcc4";
+  for (let x = ((t * 40) % 36) - 36; x < W; x += 36) {
+    roundRect(ctx, x, stripY + 10, 18, 12, 3); ctx.fill();
+    roundRect(ctx, x, stripY + stripH - 22, 18, 12, 3); ctx.fill();
+  }
+  const cellW = W / 3;
+  const pad = 14;
+  const offset = (t * 40) % cellW;
+  const first = Math.floor((t * 40) / cellW);
+  for (let k = -1; k < 4; k++) {
+    const img = bitmaps[(((k - first) % bitmaps.length) + bitmaps.length * 10) % bitmaps.length];
+    const x = k * cellW + offset + pad;
+    const y = stripY + 32;
+    const w = cellW - pad * 2;
+    const h = stripH - 64;
+    ctx.save();
+    roundRect(ctx, x, y, w, h, 14);
+    ctx.fillStyle = "#000";
+    ctx.fill();
+    roundRect(ctx, x + 4, y + 4, w - 8, h - 8, 11);
+    ctx.clip();
+    if (img) drawCover(ctx, img, 1, 1, x + 4, y + 4, w - 8, h - 8);
+    ctx.restore();
+  }
+  ctx.filter = "none";
+
+  // Warm tint + vignette + grain
+  ctx.fillStyle = "rgba(196, 150, 80, 0.16)";
+  ctx.fillRect(0, 0, W, H);
+  const vg = ctx.createRadialGradient(W / 2, MAIN_H / 2, W * 0.3, W / 2, MAIN_H / 2, W * 0.95);
+  vg.addColorStop(0, "rgba(0,0,0,0)");
+  vg.addColorStop(1, "rgba(30,18,8,0.45)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, MAIN_H);
+  ctx.save();
+  ctx.translate(-Math.random() * 128, -Math.random() * 128);
+  ctx.fillStyle = ctx.createPattern(grain, "repeat") ?? "transparent";
+  ctx.fillRect(0, 0, W + 128, H + 128);
+  ctx.restore();
+
+  // Fixed greeting
+  const cy = MAIN_H / 2;
+  ctx.fillStyle = "#fff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "rgba(0,0,0,0.55)";
+  ctx.shadowBlur = 12;
+  ctx.font = "600 22px Outfit, sans-serif";
+  ctx.letterSpacing = "6px";
+  ctx.fillText("TO MY LOVING FAMILY", W / 2, cy - 150);
+  ctx.font = "700 64px Outfit, sans-serif";
+  ctx.letterSpacing = "18px";
+  ctx.fillText("MERRY", W / 2, cy - 70);
+  ctx.letterSpacing = "0px";
+  ctx.font = "130px 'Great Vibes', cursive";
+  ctx.fillText("Christmas", W / 2, cy + 30);
+  ctx.font = "600 17px Outfit, sans-serif";
+  ctx.letterSpacing = "3px";
+  ctx.fillText("WISHING YOU LOVE, JOY AND PEACE THIS CHRISTMAS", W / 2, cy + 130);
+  ctx.letterSpacing = "0px";
+  ctx.shadowBlur = 0;
 }
 
 export async function recordSlideshow(photos: Blob[], music: Blob | null, onProgress: (p: number) => void, preparedAudio?: AudioContext, signal?: AbortSignal): Promise<{ blob: Blob; ext: string }> {
@@ -62,14 +173,13 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
   let stream: MediaStream | null = null;
   let rec: MediaRecorder | null = null;
   let frame = 0;
-  const theme = getComputedStyle(document.documentElement);
-  const colors = [theme.getPropertyValue("--pine"), theme.getPropertyValue("--gold"), theme.getPropertyValue("--snow")];
   try {
     signal?.throwIfAborted();
     if (music) {
       audioCtx ??= new AudioContext();
       await wakeSlideshowAudio(audioCtx);
     }
+    await Promise.all(["130px 'Great Vibes'", "700 64px Outfit", "600 22px Outfit"].map(f => document.fonts?.load(f).catch(() => {})));
     for (const photo of photos) bitmaps.push(await createImageBitmap(photo));
     signal?.throwIfAborted();
     const canvas = document.createElement("canvas");
@@ -95,27 +205,8 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
     rec = createSlideshowRecorder(stream);
     const chunks: Blob[] = [];
     const recorder = rec;
-    const draw = (t: number) => {
-      const idx = Math.min(Math.floor(t / PER_PHOTO), bitmaps.length - 1);
-      const local = t - idx * PER_PHOTO;
-      ctx.fillStyle = colors[0] ?? "";
-      ctx.fillRect(0, 0, W, H);
-      const current = bitmaps[idx];
-      if (current) drawCover(ctx, current, 1, 1 + 0.06 * local / PER_PHOTO);
-      const next = bitmaps[idx + 1];
-      if (next && local > PER_PHOTO - FADE) {
-        const p = (local - (PER_PHOTO - FADE)) / FADE;
-        drawCover(ctx, next, p, 1.12 - 0.12 * p);
-      }
-      for (let s = 0; s < 28; s++) {
-        ctx.globalAlpha = Math.max(0, 0.35 + 0.35 * Math.sin(t * 4 + s));
-        ctx.fillStyle = colors[s % 2 ? 1 : 2] ?? "";
-        ctx.beginPath();
-        ctx.arc((s * 97.3) % W, (s * 53.7 + t * 60 * (1 + s % 3)) % H, 2 + s % 3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-    };
+    const grain = makeGrain();
+    const draw = (t: number) => drawFilmFrame(ctx, bitmaps, t, grain);
     await new Promise<void>((resolve, reject) => {
       let stopped = false;
       const cleanup = () => {

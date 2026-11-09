@@ -98,10 +98,16 @@ function SlideshowPlayer({ images, musicUrl, musicTitle, blobs = {}, fileName = 
 
   return (
     <div className="overflow-hidden rounded-3xl bg-festive p-3 shadow-card">
-      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl sm:aspect-[4/5]">
+      <div className="relative mx-auto aspect-[9/16] w-full max-w-sm overflow-hidden rounded-2xl sepia-[.55]">
         {images.map((src, idx) => (
-          <img key={src} src={src} alt={`Christmas photo ${idx + 1}`} className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out ${idx === i ? "scale-100 opacity-100" : "scale-110 opacity-0"}`} />
+          <img key={src} src={src} alt={`Christmas photo ${idx + 1}`} className={`absolute inset-0 h-full w-full object-cover transition-all duration-[3000ms] ease-out ${idx === i ? "scale-110 opacity-100" : "scale-100 opacity-0"}`} />
         ))}
+        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center text-snow drop-shadow-lg">
+          <p className="text-[10px] font-semibold tracking-[0.3em]">TO MY LOVING FAMILY</p>
+          <p className="mt-2 text-3xl font-bold tracking-[0.3em]">MERRY</p>
+          <p className="text-6xl" style={{ fontFamily: "'Great Vibes', cursive" }}>Christmas</p>
+          <p className="mt-2 px-4 text-[9px] font-semibold tracking-[0.15em]">WISHING YOU LOVE, JOY AND PEACE THIS CHRISTMAS</p>
+        </div>
         <div className="absolute inset-x-0 bottom-0 flex justify-center gap-1.5 p-3">
           {images.map((_, idx) => (
             <span key={idx} className={`h-1.5 rounded-full transition-all ${idx === i ? "w-6 bg-gold" : "w-1.5 bg-snow/60"}`} />
