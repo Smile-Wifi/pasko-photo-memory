@@ -16,6 +16,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CreateRouteImport } from './routes/create'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ManualPaymentRouteImport } from './routes/manual-payment'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as SamplesRouteImport } from './routes/samples'
@@ -57,6 +58,11 @@ const FaqRoute = FaqRouteImport.update({
 const HowItWorksRoute = HowItWorksRouteImport.update({
   id: '/how-it-works',
   path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManualPaymentRoute = ManualPaymentRouteImport.update({
+  id: '/manual-payment',
+  path: '/manual-payment',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PricingRoute = PricingRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/manual-payment': typeof ManualPaymentRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/samples': typeof SamplesRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/manual-payment': typeof ManualPaymentRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/samples': typeof SamplesRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/faq': typeof FaqRoute
   '/how-it-works': typeof HowItWorksRoute
+  '/manual-payment': typeof ManualPaymentRoute
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/samples': typeof SamplesRoute
@@ -159,6 +168,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/faq'
     | '/how-it-works'
+    | '/manual-payment'
     | '/pricing'
     | '/privacy'
     | '/samples'
@@ -175,6 +185,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/faq'
     | '/how-it-works'
+    | '/manual-payment'
     | '/pricing'
     | '/privacy'
     | '/samples'
@@ -192,6 +203,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/faq'
     | '/how-it-works'
+    | '/manual-payment'
     | '/pricing'
     | '/privacy'
     | '/samples'
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   FaqRoute: typeof FaqRoute
   HowItWorksRoute: typeof HowItWorksRoute
+  ManualPaymentRoute: typeof ManualPaymentRoute
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   SamplesRoute: typeof SamplesRoute
@@ -268,6 +281,13 @@ declare module '@tanstack/react-router' {
       path: '/how-it-works'
       fullPath: '/how-it-works'
       preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manual-payment': {
+      id: '/manual-payment'
+      path: '/manual-payment'
+      fullPath: '/manual-payment'
+      preLoaderRoute: typeof ManualPaymentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pricing': {
@@ -348,6 +368,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   FaqRoute: FaqRoute,
   HowItWorksRoute: HowItWorksRoute,
+  ManualPaymentRoute: ManualPaymentRoute,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   SamplesRoute: SamplesRoute,

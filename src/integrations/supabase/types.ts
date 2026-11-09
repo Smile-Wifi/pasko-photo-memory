@@ -98,6 +98,60 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          booking_date: string
+          booking_time: string
+          created_at: string
+          customer_name: string
+          email: string
+          id: string
+          package_name: string
+          payment_method: string
+          persons: number | null
+          phone: string
+          proof_image_url: string
+          reference_number: string
+          sender_name: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          booking_date: string
+          booking_time: string
+          created_at?: string
+          customer_name: string
+          email: string
+          id?: string
+          package_name: string
+          payment_method: string
+          persons?: number | null
+          phone: string
+          proof_image_url: string
+          reference_number: string
+          sender_name: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          booking_date?: string
+          booking_time?: string
+          created_at?: string
+          customer_name?: string
+          email?: string
+          id?: string
+          package_name?: string
+          payment_method?: string
+          persons?: number | null
+          phone?: string
+          proof_image_url?: string
+          reference_number?: string
+          sender_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       samples: {
         Row: {
           created_at: string

@@ -6,6 +6,7 @@ const LINKS = [
   { to: "/", label: "Home" },
   { to: "/how-it-works", label: "How It Works" },
   { to: "/pricing", label: "Pricing" },
+  { to: "/manual-payment", label: "Book a Studio Session" },
   { to: "/samples", label: "Sample Photos" },
   { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact Us" },
