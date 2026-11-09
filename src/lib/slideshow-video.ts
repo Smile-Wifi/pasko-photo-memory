@@ -4,13 +4,28 @@ const H = 1080;
 const PER_PHOTO = 6;
 const FADE = 1;
 
+const VIDEO_TYPES = ["video/mp4;codecs=avc1,mp4a.40.2", "video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus"];
+
 export function pickVideoType(): { mime: string; ext: "mp4" | "webm" } | null {
   if (typeof MediaRecorder === "undefined") return null;
   // Generic video/mp4 can silently select VP9 + Opus, which iPhone Photos cannot play.
-  for (const mime of ["video/mp4;codecs=avc1,mp4a.40.2", "video/mp4;codecs=avc1.42E01E,mp4a.40.2", "video/webm;codecs=vp8,opus", "video/webm;codecs=vp9,opus"]) {
+  for (const mime of VIDEO_TYPES) {
     if (MediaRecorder.isTypeSupported(mime)) return { mime, ext: mime.startsWith("video/mp4") ? "mp4" : "webm" };
   }
   return null;
+}
+
+export function createSlideshowRecorder(stream: MediaStream): MediaRecorder {
+  if (typeof MediaRecorder !== "undefined") {
+    for (const mimeType of VIDEO_TYPES) {
+      if (!MediaRecorder.isTypeSupported(mimeType)) continue;
+      // Some phones advertise a codec but cannot initialize its encoder.
+      for (const options of [{ mimeType, videoBitsPerSecond: 4_000_000 }, { mimeType }]) {
+        try { return new MediaRecorder(stream, options); } catch { /* Try safer options, then the next codec. */ }
+      }
+    }
+  }
+  throw new Error("This browser can't create a playable video. Please open the page in Safari or Chrome.");
 }
 
 export async function wakeSlideshowAudio(ctx: AudioContext) {
@@ -37,7 +52,7 @@ function drawCover(ctx: CanvasRenderingContext2D, img: ImageBitmap, alpha: numbe
   ctx.globalAlpha = 1;
 }
 
-export async function recordSlideshow(photos: Blob[], music: Blob | null, onProgress: (p: number) => void, preparedAudio?: AudioContext): Promise<{ blob: Blob; ext: string }> {
+export async function recordSlideshow(photos: Blob[], music: Blob | null, onProgress: (p: number) => void, preparedAudio?: AudioContext, signal?: AbortSignal): Promise<{ blob: Blob; ext: string }> {
   const type = pickVideoType();
   if (!type) throw new Error("This browser can't create a playable video. Please open the page in Safari or Chrome.");
   if (!photos.length) throw new Error("Your photos are not ready yet.");
@@ -50,11 +65,13 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
   const theme = getComputedStyle(document.documentElement);
   const colors = [theme.getPropertyValue("--pine"), theme.getPropertyValue("--gold"), theme.getPropertyValue("--snow")];
   try {
+    signal?.throwIfAborted();
     if (music) {
       audioCtx ??= new AudioContext();
       await wakeSlideshowAudio(audioCtx);
     }
     for (const photo of photos) bitmaps.push(await createImageBitmap(photo));
+    signal?.throwIfAborted();
     const canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
@@ -75,7 +92,7 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
       gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + total);
       dest.stream.getAudioTracks().forEach(t => stream?.addTrack(t));
     }
-    rec = new MediaRecorder(stream, { mimeType: type.mime, videoBitsPerSecond: 4_000_000 });
+    rec = createSlideshowRecorder(stream);
     const chunks: Blob[] = [];
     const recorder = rec;
     const draw = (t: number) => {
@@ -100,24 +117,40 @@ export async function recordSlideshow(photos: Blob[], music: Blob | null, onProg
       ctx.globalAlpha = 1;
     };
     await new Promise<void>((resolve, reject) => {
-      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
-      recorder.onstop = () => resolve();
-      recorder.onerror = () => reject(new Error("Video recording failed. Please try again in Safari or Chrome."));
-      const visibility = () => {
-        if (!document.hidden) return;
+      let stopped = false;
+      const cleanup = () => {
+        stopped = true;
+        cancelAnimationFrame(frame);
         document.removeEventListener("visibilitychange", visibility);
-        reject(new Error("Recording was interrupted. Keep this page open and tap Create slideshow video again."));
+        signal?.removeEventListener("abort", abort);
+      };
+      const fail = (error: Error) => {
+        cleanup();
+        reject(error);
         if (recorder.state !== "inactive") recorder.stop();
       };
+      const abort = () => fail(new DOMException("Slideshow cancelled", "AbortError"));
+      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      recorder.onstop = () => { cleanup(); resolve(); };
+      recorder.onerror = () => fail(new Error("Video recording failed. Please try again in Safari or Chrome."));
+      const visibility = () => {
+        if (!document.hidden) return;
+        fail(new Error("Recording was interrupted. Keep this page open and tap Create slideshow video again."));
+      };
       document.addEventListener("visibilitychange", visibility);
-      const stop = recorder.onstop;
-      recorder.onstop = e => { document.removeEventListener("visibilitychange", visibility); stop?.call(recorder, e); };
-      recorder.onerror = () => { document.removeEventListener("visibilitychange", visibility); reject(new Error("Video recording failed. Please try again.")); };
-      draw(0);
-      recorder.start();
-      source?.start();
+      signal?.addEventListener("abort", abort, { once: true });
+      try {
+        signal?.throwIfAborted();
+        draw(0);
+        recorder.start();
+        source?.start();
+      } catch (error) {
+        fail(error instanceof Error ? error : new Error("Could not start video recording."));
+        return;
+      }
       const start = performance.now();
       const tick = () => {
+        if (stopped) return;
         const t = (performance.now() - start) / 1000;
         if (t >= total) { recorder.stop(); return; }
         draw(t);

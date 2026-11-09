@@ -79,7 +79,7 @@ export function CheckoutPhotoTest({ photo, template, pkg = "basic" }: { photo: s
                   </div>
                 )}
                 {slot.image && (
-                  <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => { const blob = dataUrlToBlob(slot.image!); const name = `pasko-test-${style.key}.png`; if (needsLongPressSave()) setSaveTarget({ src: slot.image!, blob, name }); else void deliverFile(blob, name); }}>
+                  <Button type="button" variant="outline" size="sm" className="w-full" onClick={() => { if (!slot.image) return; const blob = dataUrlToBlob(slot.image); const name = `pasko-test-${style.key}.png`; if (needsLongPressSave()) setSaveTarget({ src: slot.image, blob, name }); else void deliverFile(blob, name); }}>
                     <Download />Save photo
                   </Button>
                 )}
@@ -87,7 +87,7 @@ export function CheckoutPhotoTest({ photo, template, pkg = "basic" }: { photo: s
             );
           })}
         </div>
-        {premium && !busy && finished.length > 0 && music && (
+        {premium && !busy && finished.length === 5 && music && (
           <Slideshow images={slideImages} musicUrl={music.url} musicTitle={music.title} blobs={slideBlobs} fileName="pasko-test-slideshow" autoStart />
         )}
         <Button type="button" variant="festive" disabled={busy} onClick={generate}>

@@ -6,20 +6,32 @@ import { recordSlideshow, wakeSlideshowAudio } from "@/lib/slideshow-video";
 import { deliverFile } from "@/lib/download";
 import { Button } from "@/components/ui/button";
 
-export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName = "PaskoPhotoMagic-slideshow", autoStart = false }: { images: string[]; musicUrl: string | null; musicTitle: string | null; blobs?: Record<string, Blob>; fileName?: string; autoStart?: boolean }) {
+type SlideshowProps = { images: string[]; musicUrl: string | null; musicTitle: string | null; blobs?: Record<string, Blob>; fileName?: string; autoStart?: boolean };
+
+export function Slideshow(props: SlideshowProps) {
+  return <SlideshowPlayer key={JSON.stringify([props.images, props.musicUrl])} {...props} />;
+}
+
+function SlideshowPlayer({ images, musicUrl, musicTitle, blobs = {}, fileName = "PaskoPhotoMagic-slideshow", autoStart = false }: SlideshowProps) {
   const [making, setMaking] = useState<number | null>(null);
   const [video, setVideo] = useState<{ blob: Blob; ext: string; url: string } | null>(null);
   const [error, setError] = useState("");
   const [needsTap, setNeedsTap] = useState(false);
   const recording = useRef(false);
   const mounted = useRef(true);
-  useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);
+  const pending = useRef<AbortController | null>(null);
+  useEffect(() => { mounted.current = true; return () => { mounted.current = false; pending.current?.abort(); }; }, []);
   useEffect(() => () => { if (video) URL.revokeObjectURL(video.url); }, [video]);
 
   // Step 1 builds the video; a separate tap saves it (iPhone blocks saves that wait).
   async function makeVideo(automatic = false) {
     if (recording.current) return;
+    if (images.length !== 5 || !musicUrl) return;
     recording.current = true;
+    const controller = new AbortController();
+    pending.current = controller;
+    setPlaying(false);
+    audio.current?.pause();
     setMaking(0);
     setError("");
     setNeedsTap(false);
@@ -38,13 +50,14 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
         await wakeSlideshowAudio(audioContext);
       }
       const load = async (url: string) => {
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) throw new Error("Could not load the photos or music. Refresh the page and try again.");
         return response.blob();
       };
       const photos = await Promise.all(images.map(u => blobs[u] ?? load(u)));
       const music = musicUrl ? await load(musicUrl) : null;
-      const r = await recordSlideshow(photos, music, p => { if (mounted.current) setMaking(p); }, audioContext);
+      controller.signal.throwIfAborted();
+      const r = await recordSlideshow(photos, music, p => { if (mounted.current) setMaking(p); }, audioContext, controller.signal);
       if (mounted.current) setVideo({ ...r, url: URL.createObjectURL(r.blob) });
     } catch (e) {
       const message = e instanceof Error ? e.message : "Could not create the slideshow video.";
@@ -71,12 +84,13 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
   const audio = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (!playing) return;
+    if (!playing || !images.length) return;
     const id = setInterval(() => setI((x) => (x + 1) % images.length), 6000);
     return () => clearInterval(id);
   }, [playing, images.length]);
 
   function toggle() {
+    if (!images.length || recording.current) return;
     const next = !playing;
     setPlaying(next);
     if (audio.current) next ? audio.current.play().catch(() => {}) : audio.current.pause();
@@ -105,7 +119,7 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
               {muted ? <VolumeX /> : <Volume2 />}
             </Button>
           )}
-          <Button variant="gold" onClick={toggle}>{playing ? <><Pause /> Pause</> : <><Play /> Play</>}</Button>
+          <Button variant="gold" disabled={!images.length || making !== null} onClick={toggle}>{playing ? <><Pause /> Pause</> : <><Play /> Play</>}</Button>
         </div>
       </div>
       <div className="space-y-2 px-3 pb-3 text-pine-foreground">
@@ -124,9 +138,10 @@ export function Slideshow({ images, musicUrl, musicTitle, blobs = {}, fileName =
             {video.ext === "webm" && <p className="text-xs text-pine-foreground/80">WebM video · For an iPhone Photos-compatible MP4, open this page in Safari and create the video there.</p>}
           </div>
         ) : (
-          <Button variant="snow" className="w-full" onClick={() => void makeVideo()}><Clapperboard /> {needsTap ? "Tap to create slideshow with music" : "Create slideshow video with music"}</Button>
+          <Button variant="snow" className="w-full" disabled={images.length !== 5 || !musicUrl} onClick={() => void makeVideo()}><Clapperboard /> {needsTap ? "Tap to create slideshow with music" : "Create slideshow video with music"}</Button>
         )}
         {needsTap && <p className="text-sm text-pine-foreground">Your browser needs one tap to enable music. / I-tap para paganahin ang music.</p>}
+        {(images.length !== 5 || !musicUrl) && <p className="text-sm text-pine-foreground">Waiting for all 5 photos and Christmas music before creating your video.</p>}
         {error && <p role="alert" className="text-sm text-pine-foreground">{error}</p>}
       </div>
       {musicUrl && <audio ref={audio} src={musicUrl} loop preload="none" />}
